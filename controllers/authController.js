@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
 
 // POST registracija
 exports.register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, phone } = req.body;  // dodaj phone
 
   if (!name || !email || !password || !role) {
     return res.render('pages/register', { error: 'Molimo popunite sva polja' });
@@ -60,7 +60,8 @@ exports.register = async (req, res) => {
     name,
     email,
     password: hashedPassword,
-    role
+    role,
+    phone    // <--- dodano
   });
 
   await newUser.save();
@@ -75,6 +76,7 @@ exports.register = async (req, res) => {
 
   res.redirect('/users/profile');
 };
+
 
 // Logout
 exports.logout = (req, res) => {
