@@ -1,0 +1,19 @@
+<%- include("../partials/header") %>
+
+<section class="auth-card card">
+  <h2>Registracija</h2>
+  <form action="/auth/register" method="POST" class="form">
+    <input type="text" name="name" placeholder="Ime" required class="input">
+    <input type="email" name="email" placeholder="Email" required class="input">
+    <input type="password" name="password" placeholder="Lozinka" required class="input">
+    <input type="text" name="phone" placeholder="Telefon" class="input">
+    <select name="role" class="input">
+      <option value="user">Korisnik</option>
+      <option value="company">Tvrtka</option>
+      <option value="courier">Dostavljač</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Registriraj se</button>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>

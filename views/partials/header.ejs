@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dostava App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <a href="/" class="logo">Dostava App</a>
+      <div class="nav-links">
+        <% if(user){ %>
+          <a href="/users/profile">Profil</a>
+          <a href="/auth/logout">Odjava</a>
+        <% } else { %>
+          <a href="/auth/login">Prijava</a>
+          <a href="/auth/register">Registracija</a>
+        <% } %>
+      </div>
+    </nav>
+  </header>
+  <main class="main-content">

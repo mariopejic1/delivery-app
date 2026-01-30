@@ -1,0 +1,13 @@
+<%- include("../partials/header") %>
+
+<section class="card form-card">
+  <h2>Nova pošiljka</h2>
+  <form action="/shipments/new" method="POST" class="form">
+    <input type="text" name="title" placeholder="Naziv pošiljke" required class="input">
+    <input type="text" name="address" placeholder="Adresa" required class="input">
+    <input type="text" name="recipient" placeholder="Primatelj" required class="input">
+    <button type="submit" class="btn btn-primary">Dodaj pošiljku</button>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>

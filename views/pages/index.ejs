@@ -1,0 +1,14 @@
+<%- include("../partials/header") %>
+
+<section class="home-section card">
+  <h1>Dobrodošli u Dostava App</h1>
+  <p>Brza i sigurna dostava svih pošiljaka.</p>
+  <% if(!user){ %>
+    <div class="btn-group">
+      <a href="/auth/login" class="btn btn-primary">Prijava</a>
+      <a href="/auth/register" class="btn btn-secondary">Registracija</a>
+    </div>
+  <% } %>
+</section>
+
+<%- include("../partials/footer") %>

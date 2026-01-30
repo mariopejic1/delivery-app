@@ -1,0 +1,13 @@
+<%- include("../partials/header") %>
+
+<section class="auth-card card">
+  <h2>Prijava</h2>
+  <form action="/auth/login" method="POST" class="form">
+    <input type="email" name="email" placeholder="Email" required class="input">
+    <input type="password" name="password" placeholder="Lozinka" required class="input">
+    <button type="submit" class="btn btn-primary">Prijavi se</button>
+  </form>
+  <p>Nemate račun? <a href="/auth/register">Registrirajte se</a></p>
+</section>
+
+<%- include("../partials/footer") %>

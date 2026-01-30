@@ -1,0 +1,14 @@
+<%- include("../partials/header") %>
+
+<section class="card">
+  <h2>Moje pošiljke</h2>
+  <ul class="shipment-list">
+    <% shipments.forEach(s => { %>
+      <li class="shipment-item card">
+        <strong><%= s.title %></strong> - <%= s.address %> - <%= s.recipient %>
+      </li>
+    <% }) %>
+  </ul>
+</section>
+
+<%- include("../partials/footer") %>
