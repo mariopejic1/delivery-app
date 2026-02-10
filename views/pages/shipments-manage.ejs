@@ -1,0 +1,29 @@
+<%- include("../partials/header") %>
+
+<section class="card">
+  <h2>Aktivne pošiljke tvrtke</h2>
+  <ul class="shipment-list">
+    <% shipments.forEach(shipment => { %>
+      <li class="shipment-item card">
+        <strong><%= shipment.title %></strong> - <%= shipment.address %> - Status: <%= shipment.status %>
+
+        <!-- Dropdown za dodjelu kurira -->
+        <form action="/shipments/assign" method="POST" style="margin-top: 10px;">
+          <input type="hidden" name="shipmentId" value="<%= shipment._id %>">
+          <select name="courierId" required>
+            <option value="">Odaberite kurira</option>
+            <% couriers.forEach(courier => { %>
+              <option value="<%= courier._id %>" <%= shipment.courier && shipment.courier.toString() === courier._id.toString() ? 'selected' : '' %> >
+                <%= courier.name %>
+              </option>
+            <% }) %>
+          </select>
+          <button type="submit" class="btn btn-primary">Dodijeli kurira</button>
+        </form>
+
+      </li>
+    <% }) %>
+  </ul>
+</section>
+
+<%- include("../partials/footer") %>

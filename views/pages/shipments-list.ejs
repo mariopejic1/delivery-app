@@ -1,0 +1,55 @@
+<%- include("../partials/header") %>
+
+<section class="card">
+  <h2><%= typeof title !== 'undefined' ? title : "Pošiljke" %></h2>
+
+  <% if(!shipments || shipments.length === 0){ %>
+    <p>Nema pošiljki za prikaz.</p>
+  <% } else { %>
+    <ul class="shipment-list">
+      <% shipments.forEach(s => { %>
+        <li class="shipment-item card">
+          <strong>Primatelj:</strong> <%= s.receiverName %> | 
+          <strong>Adresa:</strong> <%= s.receiverAddress %> |
+          <strong>Status:</strong> <%= s.status %> |
+          <strong>Cijena:</strong> <%= s.price %> kn
+
+          <!-- Status dropdown -->
+          <% if(typeof showActions !== 'undefined' && showActions && (user.role === "DOSTAVNA_SLUŽBA" || user.role === "DOSTAVLJAC")) { %>
+            <form method="POST" action="<%= user.role === 'DOSTAVNA_SLUŽBA' ? '/shipments/update-status-company' : '/shipments/update-status' %>" class="inline-form">
+              <input type="hidden" name="shipmentId" value="<%= s._id %>">
+              <select name="status">
+                <option value="NA_CEKANJU" <%= s.status==='NA_CEKANJU'?'selected':'' %>>NA ČEKANJU</option>
+                <option value="UPUĆENO" <%= s.status==='UPUĆENO'?'selected':'' %>>UPUĆENO</option>
+                <option value="DOSTAVLJENO" <%= s.status==='DOSTAVLJENO'?'selected':'' %>>DOSTAVLJENO</option>
+              </select>
+              <button type="submit" class="btn btn-secondary">Promijeni status</button>
+            </form>
+          <% } %>
+
+          <!-- Dodjela kurira – samo tvrtka -->
+          <% if(showActions && user.role === "DOSTAVNA_SLUŽBA"){ %>
+            <form method="POST" action="/shipments/assign" class="inline-form" style="margin-top:5px;">
+              <input type="hidden" name="shipmentId" value="<%= s._id %>">
+              <% if(couriers && couriers.length > 0){ %>
+                <select name="courierId">
+                  <% couriers.forEach(c => { %>
+                    <option value="<%= c._id %>" <%= s.courier && s.courier.toString() === c._id.toString() ? 'selected' : '' %>>
+                      <%= c.name %>
+                    </option>
+                  <% }) %>
+                </select>
+              <% } else { %>
+                <span>Nema dostupnih kurira</span>
+              <% } %>
+              <button type="submit" class="btn btn-primary">Dodijeli kurira</button>
+            </form>
+          <% } %>
+
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</section>
+
+<%- include("../partials/footer") %>

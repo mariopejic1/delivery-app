@@ -11,7 +11,8 @@ const shipmentSchema = new mongoose.Schema({
   height: { type: Number, required: true },
   length: { type: Number, required: true },
   weight: { type: Number, required: true },
-  price: { type: Number, required: true },         
+  price: { type: Number, required: true },  
+  senderCompany: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null},       
   paymentMethod: { 
     type: String, 
     enum: ["GOTOVINA", "KARTICA"], 

@@ -5,7 +5,11 @@
   <ul class="shipment-list">
     <% shipments.forEach(s => { %>
       <li class="shipment-item card">
-        <strong><%= s.title %></strong> - <%= s.address %> - <%= s.recipient %>
+        <strong>Primatelj:</strong> <%= s.receiverName %> (<%= s.receiverEmail %>)<br>
+        <strong>Adresa:</strong> <%= s.receiverAddress %><br>
+        <strong>Telefon:</strong> <%= s.receiverPhone %><br>
+        <strong>Status:</strong> <%= s.status %><br>
+        <strong>Cijena:</strong> <%= s.price %> kn
       </li>
     <% }) %>
   </ul>

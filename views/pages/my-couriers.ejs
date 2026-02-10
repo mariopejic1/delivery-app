@@ -1,0 +1,21 @@
+<%- include("../partials/header") %>
+
+<section class="card">
+  <h2>Moji kuriri</h2>
+  <ul class="shipment-list">
+    <% couriers.forEach(c => { %>
+      <li class="shipment-item card">
+        <strong>Ime:</strong> <%= c.name %><br>
+        <strong>Email:</strong> <%= c.email %><br>
+        <strong>Telefon:</strong> <%= c.phone %><br>
+
+       
+      </li>
+    <% }) %>
+  </ul>
+  <div><a href="/shipments/courier/<%= c._id %>/active" class="btn btn-primary" style="margin-top:5px;">Aktivne pošiljke</a>
+        <a href="/shipments/courier/<%= c._id %>/history" class="btn btn-secondary" style="margin-top:5px;">Povijest pošiljki</a>
+  </div>
+</section>
+
+<%- include("../partials/footer") %>

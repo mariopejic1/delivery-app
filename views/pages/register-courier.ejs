@@ -1,0 +1,14 @@
+<%- include("../partials/header") %>
+
+<section class="auth-card card">
+  <h2>Registracija novog kurira</h2>
+  <form method="POST" action="/register-courier">
+    <input type="text" name="name" placeholder="Ime" required class="input">
+    <input type="email" name="email" placeholder="Email" required class="input">
+    <input type="password" name="password" placeholder="Lozinka" required class="input">
+    <input type="text" name="phone" placeholder="Telefon" class="input">
+    <button type="submit" class="btn btn-primary">Registriraj kurira</button>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>
