@@ -166,4 +166,7 @@ router.get("/my", auth, allow("KORISNIK"), async (req, res) => {
   res.render("pages/my-shipment", { shipments, user: req.user });
 });
 
+
+
+
 module.exports = router;

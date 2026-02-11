@@ -40,7 +40,7 @@ exports.login = async (req, res) => {
   };
 
   // redirect na profil ili početnu
-  res.redirect('/users/profile');
+  res.redirect('/');
 };
 
 // POST registracija
@@ -109,4 +109,44 @@ exports.logout = (req, res) => {
     if (err) console.log(err);
     res.redirect('/auth/login');
   });
+};
+
+exports.getEditProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.user.id);
+    res.render("pages/edit-profile", { user, error: null, success: null });
+  } catch (err) {
+    res.redirect("/auth/profile");
+  }
+};
+
+// Obrada ažuriranja podataka
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    const userId = req.session.user.id;
+
+    // Pronađi korisnika i ažuriraj polja (osim role i company)
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email, phone },
+      { new: true, runValidators: true }
+    );
+
+    // 🔥 KLJUČNO: Osvježi session s novim podacima
+    req.session.user.name = updatedUser.name;
+    req.session.user.email = updatedUser.email;
+
+    res.render("pages/edit-profile", { 
+      user: updatedUser, 
+      success: "Podaci su uspješno ažurirani!", 
+      error: null 
+    });
+  } catch (err) {
+    console.error(err);
+    // Ako je email već zauzet (unique error)
+    const msg = err.code === 11000 ? "Email je već u upotrebi" : "Greška pri ažuriranju";
+    const user = await User.findById(req.session.user.id);
+    res.render("pages/edit-profile", { user, error: msg, success: null });
+  }
 };

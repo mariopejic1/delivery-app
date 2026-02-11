@@ -1,40 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const userController = require("../controllers/userController");
+const { auth } = require("../middleware/auth");
 
-const { auth } = require("../middleware/auth"); // ✅ ispravljeno
-const User = require("../models/User");
+// Pregled profila
+router.get("/profile", auth, userController.getProfile);
 
+// Stranica s formom za editiranje
+router.get("/profile/edit", auth, userController.getEditProfile);
 
-// =====================
-// PROFIL
-// =====================
-router.get("/profile", auth, async (req, res) => {
-  const user = await User.findById(req.session.user.id);
-
-  res.render("pages/profile", { user });
-});
-
-
-// =====================
-// EDIT PROFILA
-// =====================
-router.post("/profile", auth, async (req, res) => {
-  const { name, email, phone } = req.body;
-
-  const user = await User.findById(req.session.user.id);
-
-  user.name = name;
-  user.email = email;
-  user.phone = phone;
-
-  await user.save();
-
-  // update session (da se odmah vidi novo ime u headeru)
-  req.session.user.name = name;
-  req.session.user.email = email;
-
-  res.redirect("/users/profile");
-});
-
+// Slanje forme (POST)
+router.post("/profile/update", auth, userController.updateProfile);
 
 module.exports = router;

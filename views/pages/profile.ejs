@@ -4,7 +4,11 @@
   <h2>Profil</h2>
   <p><strong>Ime:</strong> <%= user.name %></p>
   <p><strong>Email:</strong> <%= user.email %></p>
+  <p><strong>Telefon:</strong> <%= user.phone || 'Nije uneseno' %></p>
   <p><strong>Uloga:</strong> <%= user.role %></p>
+  
+  <hr>
+  <a href="/users/profile/edit" class="btn btn-warning">Uredi podatke</a>
 </section>
 
 <%- include("../partials/footer") %>

@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { auth } = require("../middleware/auth");
 
 // GET stranice
 router.get('/login', authController.getLoginPage);
@@ -13,5 +14,6 @@ router.post('/register', authController.register);
 
 // Logout
 router.get('/logout', authController.logout);
+
 
 module.exports = router;

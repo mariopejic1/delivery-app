@@ -148,25 +148,31 @@ console.log("All shipments in DB for this company:", await Shipment.find({compan
 exports.getCompanyHistory = async (req, res) => {
   try {
     const userId = req.session.user.id;
-
     const company = await Company.findOne({ owner: userId });
+
     if (!company) return res.send("Niste povezani s tvrtkom");
 
+    // Tražimo pošiljke koje pripadaju ILI firmi ILI vlasniku (radi sigurnosti dok ne očistiš bazu)
     const shipments = await Shipment.find({
-      company: company._id,
+      $or: [
+        { company: company._id },
+        { company: company.owner }
+      ],
       status: "DELIVERED"
     }).populate("sender courier");
+
+    console.log("Pronađeno dostavljenih pošiljki:", shipments.length);
 
     res.render("pages/shipments-list", {
       shipments,
       couriers: [],
       user: req.session.user,
-      showActions: false,
+      showActions: false, // Povijest se ne smije mijenjati
       title: "Povijest pošiljki"
     });
   } catch (err) {
     console.error(err);
-    res.send("Došlo je do pogreške prilikom dohvaćanja povijesti pošiljki");
+    res.send("Greška.");
   }
 };
 
@@ -255,22 +261,27 @@ exports.assignCourier = async (req, res) => {
 exports.updateStatusCompany = async (req, res) => {
   try {
     const { shipmentId, status } = req.body;
+    
+    // DEBUG: Ispiši što dobivaš iz forme
+    console.log("Pokušavam ažurirati pošiljku ID:", shipmentId);
 
-    const shipment = await Shipment.findOne({
-      _id: shipmentId,
-      company: req.session.user.company
-    });
+    // Nađi pošiljku samo po ID-u, bez obzira na tvrtku (samo za test!)
+    const shipment = await Shipment.findById(shipmentId);
 
-    if (!shipment) return res.sendStatus(403);
+    if (!shipment) {
+        console.log("Pošiljka s tim ID-om uopće ne postoji u bazi!");
+        return res.status(404).send("Pošiljka nije pronađena.");
+    }
+
+    console.log("Pronađena pošiljka. Njezina tvrtka u bazi je:", shipment.company);
 
     shipment.status = status;
     await shipment.save();
 
-    // Preusmjeri na listu aktivnih pošiljki tvrtke
     res.redirect("/shipments/active");
   } catch (err) {
     console.error(err);
-    res.send("Greška prilikom ažuriranja statusa pošiljke");
+    res.send("Greška na serveru.");
   }
 };
 
@@ -347,8 +358,38 @@ exports.paymentPage = (req, res) => {
 };
 
 exports.payShipment = async (req, res) => {
-  await Shipment.findByIdAndUpdate(req.params.id, { paid: true });
-  res.redirect("/shipments/my");
+  const { cardNumber, cvv, expiry } = req.body;
+  const shipmentId = req.params.id;
+
+  // Pomoćna funkcija za vraćanje greške na stranicu
+  const showError = (msg) => {
+    return res.render("pages/payment", { 
+      error: msg, 
+      shipmentId,
+      // Vraćamo i podatke da se polja ne isprazne (osim CVV-a)
+      values: req.body 
+    });
+  };
+
+  if (!/^\d{16}$/.test(cardNumber)) return showError("Broj kartice mora imati 16 znamenki");
+  if (!/^\d{3}$/.test(cvv)) return showError("CVV mora imati 3 znamenke");
+
+  const match = expiry.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+  if (!match) return showError("Format mora biti MM/YY");
+
+  const month = parseInt(match[1]);
+  const year = 2000 + parseInt(match[2]);
+  
+  // Postavljamo na zadnji dan u mjesecu radi preciznije provjere
+  const expiryDate = new Date(year, month, 0); 
+  if (expiryDate < new Date()) return showError("Kartica je istekla");
+
+  try {
+    await Shipment.findByIdAndUpdate(shipmentId, { paid: true });
+    res.redirect("/shipments/my");
+  } catch (err) {
+    showError("Greška prilikom obrade plaćanja");
+  }
 };
 
 /* =================================
