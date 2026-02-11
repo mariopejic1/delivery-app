@@ -2,10 +2,13 @@
 
 <h2>Nova pošiljka</h2>
 
+<% if (typeof error !== 'undefined') { %>
+  <p style="color:red;"><%= error %></p>
+<% } %>
+
 <form method="POST" action="/shipments/create">
 
     <h3>Primatelj</h3>
-
     <input name="receiverName" placeholder="Ime" required>
     <input name="receiverEmail" placeholder="Email primatelja" required>
     <input name="receiverPhone" placeholder="Telefon" required>
@@ -13,10 +16,10 @@
     <textarea name="description" placeholder="Opis paketa"></textarea>
     
     <h3>Dimenzije (cm)</h3>
-    <input name="width" placeholder="Širina" required>
-    <input name="height" placeholder="Visina" required>
-    <input name="length" placeholder="Dužina" required>
-    <input name="weight" placeholder="Težina (kg)" required>
+    <input name="width" placeholder="Širina" required type="number" step="any">
+    <input name="height" placeholder="Visina" required type="number" step="any">
+    <input name="length" placeholder="Dužina" required type="number" step="any">
+    <input name="weight" placeholder="Težina (kg)" required type="number" step="any">
 
     <h3>Način plaćanja</h3>
     <select name="paymentMethod">
@@ -26,11 +29,11 @@
     </select>
 
     <label for="senderCompany">Odaberite dostavnu službu:</label>
-<select name="senderCompanyName" id="senderCompany" required>
-    <% companies.forEach(company => { %>
-        <option value="<%= company.name %>"><%= company.name %></option>
-    <% }) %>
-</select>
+    <select name="company" id="senderCompany" required>
+        <% companies.forEach(company => { %>
+            <option value="<%= company._id %>"><%= company.name %></option>
+        <% }) %>
+    </select>
 
     <button type="submit">Pošalji paket</button>
 </form>

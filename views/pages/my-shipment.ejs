@@ -8,7 +8,20 @@
         <strong>Primatelj:</strong> <%= s.receiverName %> (<%= s.receiverEmail %>)<br>
         <strong>Adresa:</strong> <%= s.receiverAddress %><br>
         <strong>Telefon:</strong> <%= s.receiverPhone %><br>
-        <strong>Status:</strong> <%= s.status %><br>
+
+        <% if (s.courier) { %>
+          <strong>Kurir:</strong> <%= s.courier.name %> (<%= s.courier.phone %>)<br>
+        <% } else { %>
+          <strong>Kurir:</strong> Nije dodijeljen<br>
+        <% } %>
+
+        <strong>Status:</strong> 
+        <% if (s.status === "CREATED") { %>Kreirano<% } %>
+        <% if (s.status === "ASSIGNED") { %>Uputeno<% } %>
+        <% if (s.status === "IN_TRANSIT") { %>U tijeku<% } %>
+        <% if (s.status === "DELIVERED") { %>Dostavljeno<% } %>
+        <br>
+
         <strong>Cijena:</strong> <%= s.price %> kn
       </li>
     <% }) %>

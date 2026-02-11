@@ -1,13 +1,27 @@
 const Shipment = require("../models/Shipment");
+const Company = require("../models/Company");
 const User = require("../models/User");
-const mongoose = require("mongoose"); 
-// Izračun cijene pošiljke
+
+/* =================================
+   PRICE CALCULATION
+================================= */
 function calculatePrice(w, h, l, weight) {
   const volumetric = (w * h * l) / 5000;
   const chargeable = Math.max(volumetric, weight);
   return Math.round(chargeable * 5 + 10);
 }
 
+/* =================================
+   GET CREATE FORM (User bira company)
+================================= */
+exports.getCreateForm = async (req, res) => {
+  const companies = await Company.find();
+  res.render("pages/new-shipment", { companies, user: req.session.user });
+};
+
+/* =================================
+   CREATE SHIPMENT (USER)
+================================= */
 exports.createShipment = async (req, res) => {
   try {
     const {
@@ -15,29 +29,31 @@ exports.createShipment = async (req, res) => {
       receiverEmail,
       receiverPhone,
       receiverAddress,
-      description,
       width,
       height,
       length,
       weight,
       paymentMethod,
-      senderCompanyName // sada šaljemo ime tvrtke, ne ID
+      company,
+      description
     } = req.body;
 
-    if (!senderCompanyName) {
-      return res.status(400).send("Morate odabrati dostavnu službu");
-    }
+    if (!req.session.user) return res.redirect("/auth/login");
 
-    // Dohvati tvrtku po imenu
-    const company = await User.findOne({ name: senderCompanyName, role: "DOSTAVNA_SLUŽBA" });
-    if (!company) return res.status(400).send("Odabrana tvrtka ne postoji");
+    if (!company) {
+      const companies = await Company.find();
+      return res.render("pages/new-shipment", {
+        error: "Molimo odaberite tvrtku",
+        companies,
+        user: req.session.user
+      });
+    }
 
     const price = calculatePrice(width, height, length, weight);
 
     const shipment = await Shipment.create({
-      sender: req.user.id,             // korisnik koji kreira pošiljku
-      senderCompany: company.id,       // id tvrtke
-      senderCompanyName: company.name,  // ime tvrtke za filtriranje/prikaz
+      sender: req.session.user.id,
+      company, // ObjectId tvrtke
       receiverName,
       receiverEmail,
       receiverPhone,
@@ -47,11 +63,9 @@ exports.createShipment = async (req, res) => {
       height,
       length,
       weight,
-      paymentMethod,
       price,
       paid: paymentMethod !== "KARTICA",
-      status: "NA_CEKANJU",
-      courier: null
+      status: "CREATED" // standardno
     });
 
     if (paymentMethod === "KARTICA") {
@@ -61,112 +75,291 @@ exports.createShipment = async (req, res) => {
     res.redirect("/shipments/my");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Greška prilikom kreiranja pošiljke");
+    const companies = await Company.find();
+    res.render("pages/new-shipment", {
+      error: "Došlo je do pogreške prilikom kreiranja pošiljke",
+      companies,
+      user: req.session.user
+    });
   }
 };
 
-
-// Prikaz “mojih pošiljki” (KORISNIK)
+/* =================================
+   GET MY SHIPMENTS (USER)
+================================= */
 exports.getMyShipments = async (req, res) => {
-  try {
-    const shipments = await Shipment.find({ sender: req.user._id })
-      .populate("senderCompany", "name")  // da prikažemo ime tvrtke
-      .sort({ createdAt: -1 });
+  if (!req.session.user) return res.redirect("/auth/login");
 
-    res.render("pages/my-shipment", { shipments, user: req.user });
+  const shipments = await Shipment.find({ sender: req.session.user.id })
+    .populate("company courier");
+
+  res.render("pages/my-shipment", {
+    shipments,
+    user: req.session.user,
+    showActions: true
+  });
+};
+
+/* =================================
+   COMPANY SHIPMENTS
+================================= */
+
+/* Active shipments */
+exports.getCompanyActive = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+
+    // Dohvat tvrtke gdje je korisnik owner
+    const company = await Company.findOne({ owner: userId });
+    if (!company) return res.send("Niste povezani s tvrtkom");
+
+    const shipments = await Shipment.find({
+      company: company.owner,
+      status: { $ne: "DELIVERED" } // statusi iz modela: CREATED, ASSIGNED, IN_TRANSIT, DELIVERED
+    }).populate("sender courier");
+
+    const couriers = await User.find({
+        role: "DOSTAVLJAC",
+        company: company.owner
+      });
+      
+      console.log("Company:", company);
+console.log("All shipments in DB for this company:", await Shipment.find({company: company._id}));
+    console.log(typeof company._id);
+      console.log(company)
+    console.log("Couriers:", couriers);
+
+    res.render("pages/shipments-list", {
+      shipments,
+      couriers,
+      user: req.session.user,
+      showActions: true,
+      title: "Aktivne pošiljke"
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Greška pri dohvaćanju pošiljki");
+    res.send("Došlo je do pogreške prilikom dohvaćanja pošiljki");
   }
 };
 
-exports.getShipmentForm = async (req, res) => {
+/* =================================
+   COMPANY SHIPMENT HISTORY
+================================= */
+exports.getCompanyHistory = async (req, res) => {
   try {
-    const companies = await User.find({ role: "DOSTAVNA_SLUŽBA" }).select("name _id");
-    res.render("pages/create-shipment", { companies });
+    const userId = req.session.user.id;
+
+    const company = await Company.findOne({ owner: userId });
+    if (!company) return res.send("Niste povezani s tvrtkom");
+
+    const shipments = await Shipment.find({
+      company: company._id,
+      status: "DELIVERED"
+    }).populate("sender courier");
+
+    res.render("pages/shipments-list", {
+      shipments,
+      couriers: [],
+      user: req.session.user,
+      showActions: false,
+      title: "Povijest pošiljki"
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Greška prilikom učitavanja forme");
+    res.send("Došlo je do pogreške prilikom dohvaćanja povijesti pošiljki");
   }
 };
 
-// ostale funkcije (assignCourier, updateStatusCompany, sendNotification) možeš zadržati
-// ali najbolje je koristiti rute iz shipmentRoutes.js (vidi dolje)
 
-/* ============================================
-   TVRTKA DODJELJUJE KURIRA I MIJENJA STATUS
-============================================ */
+exports.getShipmentsByCourier = async (req, res) => {
+  const courierId = req.query.courierId;
+
+  if (!courierId) return res.redirect("/my-couriers");
+
+  const shipments = await Shipment.find({ courier: courierId })
+    .populate("sender company courier");
+
+  res.render("pages/shipments-list", {
+    shipments,
+    couriers: [], // ovdje ne prikazujemo dropdown za dodjelu
+    user: req.session.user,
+    showActions: false, // isključujemo status/dodjelu
+    title: "Pošiljke kurira"
+  });
+};
+
+exports.getShipmentsByCourier = async (req, res) => {
+  const courierId = req.query.courierId;
+
+  if (!courierId) return res.redirect("/my-couriers");
+
+  const shipments = await Shipment.find({ courier: courierId })
+    .populate("sender company courier");
+
+  res.render("pages/shipments-list", {
+    shipments,
+    couriers: [], // ovdje ne prikazujemo dropdown za dodjelu
+    user: req.session.user,
+    showActions: false, // isključujemo status/dodjelu
+    title: "Pošiljke kurira"
+  });
+};
+
+/* Shipments of specific courier */
+exports.getCourierShipments = async (req, res) => {
+  const companyId = req.session.user.company;
+  const courierId = req.params.id;
+
+  const shipments = await Shipment.find({
+    company: companyId,
+    courier: courierId
+  }).populate("sender");
+
+  res.render("pages/shipments-list", {
+    shipments,
+    couriers: [],
+    user: req.session.user,
+    showActions: false,
+    title: "Pošiljke kurira"
+  });
+};
+
+/* =================================
+   ASSIGN COURIER (COMPANY)
+================================= */
 exports.assignCourier = async (req, res) => {
   try {
     const { shipmentId, courierId } = req.body;
+
+    // Dohvat pošiljke iz baze
     const shipment = await Shipment.findById(shipmentId);
-    if (!shipment) return res.status(404).send("Pošiljka ne postoji");
+    if (!shipment) return res.send("Pošiljka nije pronađena");
 
-    if (!shipment.senderCompanyName) {
-      shipment.senderCompanyName = req.user.name; // sada po imenu
-    }
-
+    // Ažuriranje kurira i statusa pošiljke
     shipment.courier = courierId;
-    shipment.status = "UPUĆENO";
-
+    shipment.status = "ASSIGNED"; // ili "UPUĆENO"
     await shipment.save();
-    res.redirect(req.headers.referer || "/shipments/active");
+
+    // Preusmjeri na aktivne pošiljke tvrtke
+    res.redirect("/shipments/active");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.send("Greška prilikom dodjele kurira");
   }
 };
 
 
-/* ============================================
-   TVRTKA MIJENJA STATUS POŠILJKE
-============================================ */
+/* =================================
+   UPDATE STATUS (COMPANY)
+================================= */
 exports.updateStatusCompany = async (req, res) => {
   try {
     const { shipmentId, status } = req.body;
-    const shipment = await Shipment.findById(shipmentId);
 
-    if (!shipment) return res.status(404).send("Pošiljka ne postoji");
+    const shipment = await Shipment.findOne({
+      _id: shipmentId,
+      company: req.session.user.company
+    });
 
-    // Samo tvrtka koja je dodijelila kurira može mijenjati status
-    if (!shipment.senderCompany) {
-      return res.status(403).send("Pošiljka još nije preuzeta od strane tvrtke");
-    }
-
-    // Provjera da li je ulogirana osoba tvrtka koja preuzima pošiljku
-    const senderCompanyId = shipment.senderCompany.toString();
-    const userId = req.user._id.toString();
-
-    if (senderCompanyId !== userId) {
-      return res.status(403).send("Ne možete mijenjati ovu pošiljku");
-    }
+    if (!shipment) return res.sendStatus(403);
 
     shipment.status = status;
     await shipment.save();
-    res.redirect(req.headers.referer || "/dashboard-company");
 
+    // Preusmjeri na listu aktivnih pošiljki tvrtke
+    res.redirect("/shipments/active");
   } catch (err) {
-    console.log(err);
-    res.send("Greška prilikom mijenjanja statusa pošiljke");
+    console.error(err);
+    res.send("Greška prilikom ažuriranja statusa pošiljke");
   }
 };
 
-/* ============================================
-   DOSTAVLJAČ MOŽE SLATI NOTIFIKACIJE
-============================================ */
-exports.sendNotification = async (req, res) => {
+
+/* =================================
+   COURIER
+================================= */
+
+/* Active shipments for courier */
+exports.getCourierActive = async (req, res) => {
   try {
-    const { shipmentId, message } = req.body;
-    const shipment = await Shipment.findById(shipmentId);
+    const shipments = await Shipment.find({
+      courier: req.session.user.id,
+      status: { $ne: "DELIVERED" }
+    }).populate("sender company courier");
 
-    if (!shipment) return res.status(404).send("Pošiljka ne postoji");
-
-    shipment.notifications.push({ message });
-    await shipment.save();
-    res.redirect(req.headers.referer || "/dashboard-courier");
-
+    res.render("pages/shipments-list", {
+      shipments,
+      couriers: [], // ne prikazujemo dropdown
+      user: req.session.user,
+      showActions: false, // kurir ne mijenja status
+      title: "Moje aktivne pošiljke"
+    });
   } catch (err) {
-    console.log(err);
-    res.send("Greška prilikom slanja notifikacije");
+    console.error(err);
+    res.send("Došlo je do pogreške prilikom dohvaćanja pošiljki");
   }
+};
+
+// Povijest pošiljki (status = DELIVERED)
+exports.getCourierHistory = async (req, res) => {
+  try {
+    const shipments = await Shipment.find({
+      courier: req.session.user.id,
+      status: "DELIVERED"
+    }).populate("sender company courier");
+
+    res.render("pages/shipments-list", {
+      shipments,
+      couriers: [],
+      user: req.session.user,
+      showActions: false,
+      title: "Povijest pošiljki"
+    });
+  } catch (err) {
+    console.error(err);
+    res.send("Došlo je do pogreške prilikom dohvaćanja povijesti pošiljki");
+  }
+};
+
+/* Update status courier */
+exports.updateStatusCourier = async (req, res) => {
+  const { shipmentId, status } = req.body;
+
+  const shipment = await Shipment.findOne({
+    _id: shipmentId,
+    courier: req.session.user.id
+  });
+
+  if (!shipment) return res.sendStatus(403);
+
+  shipment.status = status;
+  await shipment.save();
+
+  // Vrati kurira na njegovu stranicu aktivnih pošiljki
+  res.redirect("/shipments/courier-active");
+};
+
+/* =================================
+   PAYMENT
+================================= */
+exports.paymentPage = (req, res) => {
+  res.render("pages/payment", { shipmentId: req.params.id });
+};
+
+exports.payShipment = async (req, res) => {
+  await Shipment.findByIdAndUpdate(req.params.id, { paid: true });
+  res.redirect("/shipments/my");
+};
+
+/* =================================
+   NOTIFICATIONS
+================================= */
+exports.sendNotification = async (req, res) => {
+  const { shipmentId, message } = req.body;
+
+  await Shipment.findByIdAndUpdate(shipmentId, {
+    $push: { notifications: { message } }
+  });
+
+  res.redirect("back");
 };

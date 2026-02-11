@@ -2,12 +2,25 @@
 
 <section class="dashboard card">
   <h2>Dashboard tvrtke</h2>
-  <div class="dashboard-actions">
-    <a href="/shipments/active" class="btn btn-primary">Sve aktivne pošiljke</a>
-    <a href="/shipments/history" class="btn btn-secondary">Povijest pošiljki</a>
-    <a href="/register-courier" class="btn btn-secondary">Dodaj kurira</a>
-    <a href="/my-couriers" class="btn btn-secondary">Svi moji kuriri</a>
-  </div>
+
+  <% if(!user || !user.company){ %>
+    <p style="color:red;">Niste povezani s tvrtkom. Ne možete pristupiti pošiljkama.</p>
+  <% } else { %>
+    <div class="dashboard-actions">
+      <!-- Ispravne rute za tvrtku -->
+      <a href="/shipments/company/active" class="btn btn-primary">Sve aktivne pošiljke</a>
+      <a href="/shipments/company/history" class="btn btn-secondary">Povijest pošiljki</a>
+      <a href="/register-courier" class="btn btn-secondary">Dodaj kurira</a>
+      <a href="/my-couriers" class="btn btn-secondary">Svi moji kuriri</a>
+    </div>
+  <% } %>
+
+  <!-- Debug panel (opcionalno, može se maknuti) -->
+  <section style="margin-top:20px;">
+    <h3>Debug info</h3>
+    <pre>Role: <%= user.role %>, Company ID: <%= user.company %></pre>
+  </section>
+
 </section>
 
 <%- include("../partials/footer") %>

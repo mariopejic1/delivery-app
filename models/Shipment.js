@@ -1,37 +1,35 @@
 const mongoose = require("mongoose");
 
 const shipmentSchema = new mongoose.Schema({
-  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  receiverName: { type: String, required: true },
-  receiverEmail: { type: String, required: true },
-  receiverPhone: { type: String },                  
-  receiverAddress: { type: String, required: true },
-  description: { type: String },                   
-  width: { type: Number, required: true },
-  height: { type: Number, required: true },
-  length: { type: Number, required: true },
-  weight: { type: Number, required: true },
-  price: { type: Number, required: true },  
-  senderCompany: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null},       
-  paymentMethod: { 
-    type: String, 
-    enum: ["GOTOVINA", "KARTICA"], 
-    required: true 
+
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
   },
-  paid: {
-  type: Boolean,
-  default: false
+
+  company: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company",
+    required: true
   },
-  status: { 
-    type: String, 
-    enum: ["NA_CEKANJU", "UPUĆENO", "DOSTAVLJENO"], 
-    default: "NA_CEKANJU" 
+
+  courier: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   },
-  courier: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
-  notifications: [{
-    message: String,
-    date: { type: Date, default: Date.now }
-  }]
+
+  receiverName: String,
+  address: String,
+  weight: Number,
+  price: Number,
+
+  status: {
+    type: String,
+    enum: ["CREATED", "ASSIGNED", "IN_TRANSIT", "DELIVERED"],
+    default: "CREATED"
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Shipment", shipmentSchema);
