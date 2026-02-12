@@ -6,64 +6,92 @@
   <% if(!shipments || shipments.length === 0){ %>
     <p>Nema pošiljki za prikaz.</p>
   <% } else { %>
-    <ul class="shipment-list">
+    <ul class="shipment-list" style="list-style: none; padding: 0;">
       <% shipments.forEach(s => { %>
         <% const statusMap = { CREATED: "NA ČEKANJU", ASSIGNED: "UPUĆENO", IN_TRANSIT: "UPUĆENO", DELIVERED: "DOSTAVLJENO" } %>
 
-        <li class="shipment-item card">
-          <strong>Primatelj:</strong> <%= s.receiverName %> | 
-          <strong>Adresa:</strong> <%= s.receiverAddress %> |
-          <strong>Status:</strong> <%= statusMap[s.status] %> |
-          <strong>Cijena:</strong> <%= s.price %> kn
-          <% if(s.courier) { %>
-            | <strong>Kurir:</strong> <%= s.courier.name %>
-          <% } %>
+        <li class="shipment-item card" style="padding: 15px; margin-bottom: 20px;">
+          
+          <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0; color: #666; font-size: 0.9em;">
+            <strong>Datum stvaranja pošiljke:</strong> 
+            <%= new Date(s.createdAt).toLocaleDateString('hr-HR') %> u 
+            <%= new Date(s.createdAt).toLocaleTimeString('hr-HR', {hour: '2-digit', minute:'2-digit'}) %>
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <strong>Primatelj:</strong><br>
+            Ime: <%= s.receiverName %><br>
+            Email: <%= s.receiverEmail %><br>
+            Adresa: <%= s.receiverAddress %><br>
+            Telefon: <%= s.receiverPhone %>
+          </div>
 
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
 
-          <!-- Status dropdown -->
-          <% if(typeof showActions !== 'undefined' && showActions && (user.role === "DOSTAVNA_SLUŽBA" || user.role === "DOSTAVLJAC")) { %>
-            <form method="POST" action="<%= user.role === 'DOSTAVNA_SLUŽBA' ? '/shipments/update-status-company' : '/shipments/update-status' %>" class="inline-form" style="margin-top:5px;">
-              <input type="hidden" name="shipmentId" value="<%= s._id %>">
-              <select name="status">
-                <option value="CREATED" <%= s.status==='CREATED'?'selected':'' %>>NA ČEKANJU</option>
-                <option value="ASSIGNED" <%= s.status==='ASSIGNED'?'selected':'' %>>UPUĆENO</option>
-                <option value="IN_TRANSIT" <%= s.status==='IN_TRANSIT'?'selected':'' %>>U TIJEKU</option>
-                <option value="DELIVERED" <%= s.status==='DELIVERED'?'selected':'' %>>DOSTAVLJENO</option>
-              </select>
-              <button type="submit" class="btn btn-secondary">Promijeni status</button>
-            </form>
-          <% } %>
+          <div style="margin-bottom: 10px;">
+            <strong>Pošiljatelj:</strong><br>
+            <% if(s.sender) { %>
+              Ime: <%= s.sender.name %><br>
+              Email: <%= s.sender.email %><br>
+              Telefon: <%= s.sender.phone || 'Nema tel.' %>
+            <% } else { %>
+              Nepoznato
+            <% } %>
+          </div>
 
-          <!-- Dodjela kurira – samo tvrtka -->
-          <% if(showActions && user.role === "DOSTAVNA_SLUŽBA"){ %>
-            <form method="POST" action="/shipments/assign" class="inline-form" style="margin-top:5px;">
-              <input type="hidden" name="shipmentId" value="<%= s._id %>">
-              <% if(couriers && couriers.length > 0){ %>
-                <select name="courierId">
-                  <% couriers.forEach(c => { %>
-                    <option value="<%= c._id %>" <%= s.courier && s.courier._id.toString() === c._id.toString() ? 'selected' : '' %>>
-                      <%= c.name %>
-                    </option>
-                  <% }) %>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+
+          <div style="margin-bottom: 10px;">
+            <strong>Status:</strong> <%= statusMap[s.status] %><br>
+            <strong>Cijena:</strong> <%= s.price %> €<br>
+            <% if(s.courier) { %>
+              <strong>Kurir:</strong> <%= s.courier.name %> (<%= s.courier.phone || 'Nema tel.' %>)
+            <% } %>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+
+          <div class="actions">
+            <% if(typeof showActions !== 'undefined' && showActions && user.role === "DOSTAVNA_SLUŽBA") { %>
+              <form method="POST" action="/shipments/update-status-company" class="inline-form" style="margin-top:5px;">
+                <input type="hidden" name="shipmentId" value="<%= s._id %>">
+                <select name="status">
+                  <option value="CREATED" <%= s.status==='CREATED'?'selected':'' %>>NA ČEKANJU</option>
+                  <option value="ASSIGNED" <%= s.status==='ASSIGNED'?'selected':'' %>>UPUĆENO</option>
+                  <option value="IN_TRANSIT" <%= s.status==='IN_TRANSIT'?'selected':'' %>>U TIJEKU</option>
+                  <option value="DELIVERED" <%= s.status==='DELIVERED'?'selected':'' %>>DOSTAVLJENO</option>
                 </select>
-              <% } else { %>
-                <span>Nema dostupnih kurira</span>
-              <% } %>
-              <button type="submit" class="btn btn-primary">Dodijeli kurira</button>
-            </form>
-          <% } %>
+                <button type="submit" class="btn btn-secondary">Promijeni status</button>
+              </form>
 
-          <!-- Status dropdown za kurira -->
-          <% if(user && user.role === "DOSTAVLJAC" && s.courier && (s.courier._id || s.courier).toString() === (user.id || user._id).toString()){ %>            <form method="POST" action="/shipments/update-status" class="inline-form" style="margin-top:5px;">
-              <input type="hidden" name="shipmentId" value="<%= s._id %>">
-              <select name="status">
-                <option value="ASSIGNED" <%= s.status==='ASSIGNED'?'selected':'' %>>UPUĆENO</option>
-                <option value="IN_TRANSIT" <%= s.status==='IN_TRANSIT'?'selected':'' %>>U TIJEKU</option>
-                <option value="DELIVERED" <%= s.status==='DELIVERED'?'selected':'' %>>DOSTAVLJENO</option>
-              </select>
-              <button type="submit" class="btn btn-secondary btn-sm">Promijeni status</button>
-            </form>
-          <% } %>
+              <form method="POST" action="/shipments/assign" class="inline-form" style="margin-top:5px;">
+                <input type="hidden" name="shipmentId" value="<%= s._id %>">
+                <% if(typeof couriers !== 'undefined' && couriers.length > 0){ %>
+                  <select name="courierId">
+                    <option value="">Odaberi kurira</option>
+                    <% couriers.forEach(c => { %>
+                      <option value="<%= c._id %>" <%= s.courier && (s.courier._id || s.courier).toString() === c._id.toString() ? 'selected' : '' %>>
+                        <%= c.name %>
+                      </option>
+                    <% }) %>
+                  </select>
+                  <button type="submit" class="btn btn-primary">Dodijeli kurira</button>
+                <% } %>
+              </form>
+            <% } %>
+
+            <% if(user && user.role === "DOSTAVLJAC" && s.courier && (s.courier._id || s.courier).toString() === (user.id || user._id).toString()){ %>
+              <form method="POST" action="/shipments/update-status" class="inline-form" style="margin-top:5px;">
+                <input type="hidden" name="shipmentId" value="<%= s._id %>">
+                <select name="status">
+                  <option value="ASSIGNED" <%= s.status==='ASSIGNED'?'selected':'' %>>UPUĆENO</option>
+                  <option value="IN_TRANSIT" <%= s.status==='IN_TRANSIT'?'selected':'' %>>U TIJEKU</option>
+                  <option value="DELIVERED" <%= s.status==='DELIVERED'?'selected':'' %>>DOSTAVLJENO</option>
+                </select>
+                <button type="submit" class="btn btn-secondary btn-sm">Promijeni status (Kurir)</button>
+              </form>
+            <% } %>
+          </div>
 
         </li>
       <% }) %>

@@ -1,11 +1,81 @@
 <%- include("../partials/header") %>
 
-<section class="dashboard card">
-  <h2>Dashboard korisnika</h2>
-  <div class="dashboard-actions">
-    <a href="/shipments/new" class="btn btn-primary">Nova pošiljka</a>
-    <a href="/shipments/my" class="btn btn-secondary">Moje pošiljke</a>
+<style>
+  /* Kontejner dashboarda */
+  .dashboard-container { padding: 30px; margin-top: 20px; }
+  
+  /* Grupa gumba */
+  .btn-group { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
+  
+  /* Poseban stil za obavijesti gumb s badgeom */
+  .btn-notif-wrapper { position: relative; display: inline-block; }
+  
+  .notif-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    animation: pulse-animation 2s infinite;
+  }
+
+  @keyframes pulse-animation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* Sekcija za zadnje obavijesti */
+  .latest-notifs-section { margin-top: 35px; border-top: 2px solid #f1f1f1; padding-top: 25px; }
+  .notif-card-mini {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    background: #ffffff;
+    border: 1px solid #eee;
+    border-left: 5px solid #bdc3c7; /* Standardna siva za pročitane */
+    transition: 0.3s;
+  }
+  .notif-card-mini.unread {
+    border-left-color: #f39c12; /* Narančasta za nove */
+    background: #fffdf9;
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.1);
+  }
+  .notif-card-mini small { color: #888; }
+</style>
+
+<section class="dashboard-container card">
+  <div class="welcome-header">
+    <h1>Dobrodošli, <%= user.name %>! 👋</h1>
+    <p>Upravljajte svojim pošiljkama i pratite obavijesti u stvarnom vremenu.</p>
   </div>
+
+  <div class="btn-group">
+    <a href="/shipments/new" class="btn btn-primary">➕ Nova pošiljka</a>
+    <a href="/shipments/my" class="btn btn-secondary">📦 Moje pošiljke</a>
+    
+    <div class="btn-notif-wrapper">
+      <a href="/notifications" class="btn btn-warning">
+        🔔 Obavijesti
+      </a>
+      <% if (locals.unreadCount && unreadCount > 0) { %>
+        <span class="notif-badge"><%= unreadCount %></span>
+      <% } %>
+    </div>
+  </div>
+
+  
+  
 </section>
 
 <%- include("../partials/footer") %>

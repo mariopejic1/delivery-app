@@ -6,9 +6,22 @@
   <p><strong>Email:</strong> <%= user.email %></p>
   <p><strong>Telefon:</strong> <%= user.phone || 'Nije uneseno' %></p>
   <p><strong>Uloga:</strong> <%= user.role %></p>
-  
+
+  <% if (user.role === 'DOSTAVNA_SLUŽBA' && company) { %>
+    <p><strong>Cijena dostave:</strong> <%= company.deliveryPrice %> €</p>
+  <% } else if (user.role === 'DOSTAVNA_SLUŽBA') { %>
+      <p style="color: red;">Tvrtka nije povezana s vašim profilom.</p>
+  <% } %>
   <hr>
-  <a href="/users/profile/edit" class="btn btn-warning">Uredi podatke</a>
+  <div class="btn-group" style="display: flex; gap: 10px; align-items: center;">
+    <a href="/users/profile/edit" class="btn btn-warning">Uredi podatke</a>
+
+    <form action="/users/profile/delete" method="POST" onsubmit="return confirm('Jeste li sigurni da želite obrisati profil? Ova akcija je nepovratna.');" style="display: inline;">
+      <button type="submit" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">
+        Obriši profil
+      </button>
+    </form>
+  </div>
 </section>
 
 <%- include("../partials/footer") %>

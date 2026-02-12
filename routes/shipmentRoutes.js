@@ -25,6 +25,7 @@ router.get("/courier", auth, allow("DOSTAVNA_SLUŽBA"), controller.getShipmentsB
 router.get("/courier-active", auth, allow("DOSTAVLJAC"), controller.getCourierActive);
 router.get("/courier-history", auth, allow("DOSTAVLJAC"), controller.getCourierHistory);
 router.post("/update-status", auth, allow("DOSTAVLJAC"), controller.updateStatusCourier);
+router.get("/track", controller.trackShipment);
 
 /* Alias rute za dashboard i jednostavnije linkove */
 router.get("/active", auth, allow("DOSTAVNA_SLUŽBA"), controller.getCompanyActive);

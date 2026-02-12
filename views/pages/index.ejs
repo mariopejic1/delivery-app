@@ -1,8 +1,67 @@
 <%- include("../partials/header") %>
 
 <section class="home-section card">
-  <h1>Dobrodošli u Dostava App</h1>
+  <h1>Dobrodošli na našu stranicu</h1>
+  <p>Odaberite svoju dostavnu službu i pošaljite pošiljku.</p>
   <p>Brza i sigurna dostava svih pošiljaka.</p>
+
+  <div class="tracking-box" style="margin: 20px 0; padding: 20px; background: #f4f4f4; border-radius: 8px;">
+    <h3>📦 Prati svoju pošiljku</h3>
+    <form action="/" method="GET" class="inline-form">
+      <input type="text" name="trackingId" placeholder="Unesite ID pošiljke..." required 
+             style="padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 4px;">
+      <button type="submit" class="btn btn-primary">Traži</button>
+    </form>
+
+    <% if (locals.error) { %>
+      <p style="color: #dc3545; margin-top: 10px;"><%= error %></p>
+    <% } %>
+
+    <% if (locals.shipment) { %>
+      <div class="tracking-result" style="margin-top: 20px; border: 1px solid #ddd; padding: 20px; text-align: left; background: #fff;">
+        <h4>Rezultat za: <small><%= shipment._id %></small></h4>
+        <hr>
+
+        <p><strong>Datum kreiranja:</strong> <%= new Date(shipment.createdAt).toLocaleDateString('hr-HR') %> u <%= new Date(shipment.createdAt).toLocaleTimeString('hr-HR', {hour: '2-digit', minute:'2-digit'}) %></p>
+        
+        <p><strong>Status:</strong> 
+          <% const statusMap = { CREATED: "NA ČEKANJU", ASSIGNED: "UPUĆENO", IN_TRANSIT: "U TIJEKU", DELIVERED: "DOSTAVLJENO" } %>
+          <span style="font-weight: bold; color: #2980b9;"><%= statusMap[shipment.status] %></span>
+        </p>
+
+        <p><strong>PRIMATELJ:</strong></p>
+        <p style="padding-left: 15px;">
+          Ime: <%= shipment.receiverName %><br>
+          Adresa: <%= shipment.receiverAddress %><br>
+          Telefon: <%= shipment.receiverPhone %><br>
+          Email: <%= shipment.receiverEmail %>
+        </p>
+
+        <p><strong>POŠILJATELJ:</strong></p>
+        <p style="padding-left: 15px;">
+          <% if(shipment.sender) { %>
+            Ime: <%= shipment.sender.name %><br>
+            Email: <%= shipment.sender.email %><br>
+            Telefon: <%= shipment.sender.phone || 'Nije naveden' %>
+          <% } else { %>
+            Podaci o pošiljatelju nisu dostupni.
+          <% } %>
+        </p>
+
+        <p><strong>DETALJI DOSTAVE:</strong></p>
+        <p style="padding-left: 15px;">
+          Cijena: <strong><%= shipment.price %> €</strong><br>
+          <% if(shipment.company) { %>
+            Dostavna služba: <%= shipment.company.name %><br>
+          <% } %>
+          <% if(shipment.courier) { %>
+            Kurir: <%= shipment.courier.name %> | Telefon: <%= shipment.courier.phone || 'Nema mob.' %>
+          <% } %>
+        </p>
+      </div>
+    <% } %>
+  </div>
+
   <% if(!user){ %>
     <div class="btn-group">
       <a href="/auth/login" class="btn btn-primary">Prijava</a>

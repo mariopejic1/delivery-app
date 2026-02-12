@@ -1,0 +1,48 @@
+<%- include("../partials/header") %>
+
+<style>
+  .notif-page { max-width: 800px; margin: 30px auto; padding: 0 15px; }
+  .notif-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-left: 6px solid #ccc;
+    transition: transform 0.2s;
+  }
+  .notif-card.new { border-left-color: #2ed573; background: #f1fcf4; }
+  .notif-header { display: flex; justify-content: space-between; align-items: center; }
+  .notif-title { margin: 0; font-size: 1.1em; color: #2f3542; }
+  .notif-time { font-size: 0.8em; color: #747d8c; }
+  .notif-body { margin: 10px 0; color: #57606f; line-height: 1.4; }
+  .track-link { display: inline-block; margin-top: 5px; color: #1e90ff; text-decoration: none; font-weight: bold; font-size: 0.85em; }
+</style>
+
+<div class="notif-page">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+    <h2>🔔 Sve obavijesti</h2>
+    <a href="/dashboard-user" class="btn btn-outline-secondary btn-sm">Natrag</a>
+  </div>
+
+  <% if (!notifications || notifications.length === 0) { %>
+    <div class="card" style="text-align: center; padding: 50px;">
+      <p>Nema zapisa u vašem inboxu.</p>
+    </div>
+  <% } else { %>
+    <% notifications.forEach(n => { %>
+      <div class="notif-card <%= n.isRead ? '' : 'new' %>">
+        <div class="notif-header">
+          <h4 class="notif-title"><%= n.title %></h4>
+          <span class="notif-time"><%= n.createdAt.toLocaleString('hr-HR') %></span>
+        </div>
+        <p class="notif-body"><%= n.message %></p>
+        <% if (n.shipmentId) { %>
+          <a href="/?trackingId=<%= n.shipmentId %>" class="track-link">🔍 Detalji pošiljke</a>
+        <% } %>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<%- include("../partials/footer") %>

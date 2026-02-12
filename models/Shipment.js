@@ -20,16 +20,28 @@ const shipmentSchema = new mongoose.Schema({
   },
 
   receiverName: String,
-  address: String,
-  weight: Number,
-  price: Number,
+  receiverEmail: String,    // DODANO
+  receiverPhone: String,    // DODANO (usklađeno s kontrolerom)
+  receiverAddress: String,  // PROMIJENJENO (usklađeno s kontrol
 
+  price: { 
+    type: Number, 
+    default: 0 
+  },
+  
   status: {
     type: String,
     enum: ["CREATED", "ASSIGNED", "IN_TRANSIT", "DELIVERED"],
     default: "CREATED"
-  }
+  },
 
+  history: [
+  {
+    status: String,
+    updatedAt: { type: Date, default: Date.now },
+    message: String
+  }
+  ]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Shipment", shipmentSchema);

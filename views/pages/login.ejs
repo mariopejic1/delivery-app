@@ -2,6 +2,13 @@
 
 <section class="auth-card card">
   <h2>Prijava</h2>
+
+  <% if (locals.error) { %>
+    <div class="alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+
   <form action="/auth/login" method="POST" class="form">
     <input type="email" name="email" placeholder="Email" required class="input">
     <input type="password" name="password" placeholder="Lozinka" required class="input">
@@ -9,5 +16,33 @@
   </form>
   <p>Nemate račun? <a href="/auth/register">Registrirajte se</a></p>
 </section>
+
+<style>
+  .alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+  .auth-card {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+</style>
 
 <%- include("../partials/footer") %>

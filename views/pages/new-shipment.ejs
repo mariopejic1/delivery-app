@@ -2,27 +2,32 @@
 
 <h2>Nova pošiljka</h2>
 
-<% if (typeof error !== 'undefined') { %>
-  <p style="color:red;"><%= error %></p>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; margin-bottom: 15px;">
+        <%= error %>
+    </div>
 <% } %>
 
 <form method="POST" action="/shipments/create">
 
     <h3>Primatelj</h3>
-    <input name="receiverName" placeholder="Ime" required>
-    <input name="receiverEmail" placeholder="Email primatelja" required>
-    <input name="receiverPhone" placeholder="Telefon" required>
-    <input name="receiverAddress" placeholder="Adresa" required>
+    <input name="receiverName" placeholder="Ime i prezime" required class="input">
+    
+    <input name="receiverEmail" type="email" placeholder="Email primatelja" required class="input">
+    
+    <input name="receiverPhone" type="tel" pattern="\d+" title="Unesite samo znamenke" placeholder="Telefon (samo znamenke)" required class="input">
+    
+    <input name="receiverAddress" placeholder="Adresa" required class="input">
     <textarea name="description" placeholder="Opis paketa"></textarea>
     
     <h3>Dimenzije (cm)</h3>
-    <input name="width" placeholder="Širina" required type="number" step="any">
-    <input name="height" placeholder="Visina" required type="number" step="any">
-    <input name="length" placeholder="Dužina" required type="number" step="any">
-    <input name="weight" placeholder="Težina (kg)" required type="number" step="any">
+    <input name="width" placeholder="Širina" required type="number" min="0.1" step="any">
+    <input name="height" placeholder="Visina" required type="number" min="0.1" step="any">
+    <input name="length" placeholder="Dužina" required type="number" min="0.1" step="any">
+    <input name="weight" placeholder="Težina (kg)" required type="number" min="0.1" step="any">
 
     <h3>Način plaćanja</h3>
-    <select name="paymentMethod">
+    <select name="paymentMethod" required>
         <option value="GOTOVINA">Gotovina unaprijed</option>
         <option value="PRILIKOM_POUZECA">Plaćanje prilikom preuzimanja</option>
         <option value="KARTICA">Kartično plaćanje</option>
@@ -30,8 +35,9 @@
 
     <label for="senderCompany">Odaberite dostavnu službu:</label>
     <select name="company" id="senderCompany" required>
-        <% companies.forEach(company => { %>
-            <option value="<%= company._id %>"><%= company.name %></option>
+        <option value="" disabled selected>Odaberite tvrtku</option>
+        <% companies.forEach(c => { %>
+            <option value="<%= c._id %>"><%= c.name %> (<%= c.deliveryPrice %> €)</option>
         <% }) %>
     </select>
 

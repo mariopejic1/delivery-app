@@ -12,4 +12,5 @@ router.get("/profile/edit", auth, userController.getEditProfile);
 // Slanje forme (POST)
 router.post("/profile/update", auth, userController.updateProfile);
 
+router.post('/profile/delete', userController.deleteProfile);
 module.exports = router;

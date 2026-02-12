@@ -4,27 +4,51 @@
   <h2>Moje pošiljke</h2>
   <ul class="shipment-list">
     <% shipments.forEach(s => { %>
-      <li class="shipment-item card">
-        <strong>Primatelj:</strong> <%= s.receiverName %> (<%= s.receiverEmail %>)<br>
-        <strong>Adresa:</strong> <%= s.receiverAddress %><br>
-        <strong>Telefon:</strong> <%= s.receiverPhone %><br>
+      <li class="shipment-item card" style="margin-bottom: 20px; padding: 15px; list-style: none; border-left: 5px solid #3498db;">
+        
+        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0; color: #666; font-size: 0.9em;">
+        <strong>Datum stvaranja pošiljke:</strong> 
+          <%= new Date(s.createdAt).toLocaleDateString('hr-HR') %> u 
+          <%= new Date(s.createdAt).toLocaleTimeString('hr-HR', {hour: '2-digit', minute:'2-digit'}) %>
+        </div>
 
-        <% if (s.courier) { %>
-          <strong>Kurir:</strong> <%= s.courier.name %> (<%= s.courier.phone %>)<br>
+        <strong>ID pošiljke:</strong> <span style="font-family: monospace; color: #555;"><%= s._id %></span><br>
+        
+        <strong>Primatelj:</strong> <%= s.receiverName %> (<%= s.receiverEmail %>)<br>
+        <strong>Adresa primatelja:</strong> <%= s.receiverAddress %><br>
+        <strong>Telefon primatelja:</strong> <%= s.receiverPhone %><br>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+
+        <strong>Dostavna služba:</strong> 
+        <%= s.company ? s.company.name : "Nepoznato" %><br> <% if (s.courier) { %>
+            <strong>Kurir:</strong> <%= s.courier.name %><br>
+            <strong>Telefon kurira:</strong> 
+            <a href="tel:<%= s.courier.phone %>">
+                <%= s.courier.phone || "Nije naveden" %>
+            </a><br>
         <% } else { %>
-          <strong>Kurir:</strong> Nije dodijeljen<br>
+            <strong>Kurir:</strong> <span style="color: orange;">Još nije dodijeljen</span><br>
         <% } %>
 
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+
         <strong>Status:</strong> 
-        <% if (s.status === "CREATED") { %>Kreirano<% } %>
-        <% if (s.status === "ASSIGNED") { %>Uputeno<% } %>
-        <% if (s.status === "IN_TRANSIT") { %>U tijeku<% } %>
-        <% if (s.status === "DELIVERED") { %>Dostavljeno<% } %>
+        <span class="status-badge">
+          <% if (s.status === "CREATED") { %>Kreirano<% } %>
+          <% if (s.status === "ASSIGNED") { %>Dodijeljen kurir<% } %>
+          <% if (s.status === "IN_TRANSIT") { %>U tijeku dostave<% } %>
+          <% if (s.status === "DELIVERED") { %>Dostavljeno<% } %>
+        </span>
         <br>
 
-        <strong>Cijena:</strong> <%= s.price %>
+        <strong>Cijena:</strong> <span style="font-size: 1.2em; font-weight: bold; color: #2ecc71;"><%= s.price %> €</span>
       </li>
     <% }) %>
+    
+    <% if (shipments.length === 0) { %>
+      <p>Trenutno nemate niti jednu poslanu pošiljku.</p>
+    <% } %>
   </ul>
 </section>
 

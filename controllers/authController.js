@@ -13,40 +13,61 @@ exports.getRegisterPage = (req, res) => {
 };
 
 // POST login
+
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.render('pages/login', { error: 'Molimo unesite email i lozinku' });
+    // 1. Osnovna provjera unosa
+    if (!email || !password) {
+      return res.render('pages/login', { error: 'Molimo unesite email i lozinku' });
+    }
+
+    // 2. Pronađi korisnika
+    const user = await User.findOne({ email });
+    
+    // Provjera postoji li korisnik uopće
+    if (!user) {
+      return res.render('pages/login', { error: 'Korisnik s ovim emailom ne postoji.' });
+    }
+
+    // 3. PROVJERA AKTIVNOSTI I ROLE (Ovo si tražio)
+    // Blokiramo ako je deaktiviran ILI ako ima ulogu bivšeg dostavljača
+    if (user.active === false || user.role === "BIVSI_DOSTAVLJAC") {
+      return res.render('pages/login', { 
+        error: 'Ovaj račun ne postoji.' 
+      });
+    }
+
+    // 4. Provjera lozinke
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.render('pages/login', { error: 'Neispravna lozinka.' });
+    }
+
+    // 5. Kreiranje sesije
+    req.session.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      company: user.company
+    };
+
+    // 6. Uspješan login - vodi na dashboard ili početnu
+    res.redirect('/');
+
+  } catch (err) {
+    console.error("Login Error:", err);
+    res.render('pages/login', { error: 'Došlo je do pogreške na serveru.' });
   }
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.render('pages/login', { error: 'Korisnik ne postoji' });
-  }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.render('pages/login', { error: 'Neispravna lozinka' });
-  }
-
-  // Spremi korisnika u session
-  req.session.user = {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    company: user.company
-  };
-
-  // redirect na profil ili početnu
-  res.redirect('/');
 };
 
 // POST registracija
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    // 1. Dodano deliveryPrice u destrukturiranje
+    const { name, email, password, role, phone, deliveryPrice } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.render('pages/register', { error: 'Molimo popunite sva polja' });
@@ -59,49 +80,66 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let companyId = null;
-
     // Ako je role DOSTAVNA_SLUŽBA, kreiraj Company dokument
     if (role === 'DOSTAVNA_SLUŽBA') {
-    // 1. Kreiraj korisnika prvo (bez company)
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      phone
-    });
-    await newUser.save();
+      // 1. Kreiraj korisnika prvo
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        phone
+      });
+      await newUser.save();
 
-    // 2. Kreiraj Company i postavi owner
-    const newCompany = new Company({
-      name,
-      phone,
-      owner: newUser._id
-    });
-    await newCompany.save();
+      // 2. Kreiraj Company, postavi owner i DODAJ deliveryPrice
+      const newCompany = new Company({
+        name,
+        phone,
+        owner: newUser._id,
+        deliveryPrice: deliveryPrice || 0 // Spremanje cijene u Company model
+      });
+      await newCompany.save();
 
-    // 3. Poveži korisnika s tvrtkom
-    newUser.company = newCompany._id;
-    await newUser.save();
+      // 3. Poveži korisnika s tvrtkom
+      newUser.company = newCompany._id;
+      await newUser.save();
 
-    // 4. Logiraj korisnika u session
-    req.session.user = {
-      id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      company: newCompany._id
-    };
+      // 4. Logiraj korisnika u session
+      req.session.user = {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        company: newCompany._id
+      };
 
-    return res.redirect('/users/profile');
-  }
+      return res.redirect('/'); // Promijenjeno na početnu radi dosljednosti
+    } else {
+      // Logika za običnog KORISNIKA (ako nije dostavna služba)
+      const newUser = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        phone
+      });
+      
+      req.session.user = {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      };
+      
+      return res.redirect('/');
+    }
+
   } catch (err) {
     console.error(err);
     res.render('pages/register', { error: 'Greška prilikom registracije' });
   }
 };
-
 
 // Logout
 exports.logout = (req, res) => {

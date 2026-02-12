@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["KORISNIK", "DOSTAVLJAC", "DOSTAVNA_SLUŽBA"],
+    enum: ["KORISNIK", "DOSTAVLJAC", "DOSTAVNA_SLUŽBA", "BIVSI_DOSTAVLJAC"],
     default: "KORISNIK"
   },
 
@@ -21,8 +21,14 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
     default: null
-  }
+  },
 
+  active: {
+    type: Boolean,
+    default: true
+  },
+
+  
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

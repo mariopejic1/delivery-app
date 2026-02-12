@@ -7,27 +7,30 @@
     <p>Nema registriranih kurira.</p>
   <% } else { %>
     <ul class="list-group">
-
       <% couriers.forEach(c => { %>
-        <li class="list-group-item">
+        <li class="list-group-item" style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             <strong>Ime:</strong> <%= c.name %><br>
             <strong>Email:</strong> <%= c.email %><br>
             <strong>Telefon:</strong> <%= c.phone || "Nije postavljeno" %>
           </div>
 
-          <div style="margin-top: 10px;">
-            <!-- Dropdown ili link za prikaz pošiljki kurira -->
+          <div style="display: flex; gap: 10px;">
             <form method="GET" action="/shipments/courier">
               <input type="hidden" name="courierId" value="<%= c._id %>">
               <button type="submit" class="btn btn-primary btn-sm">
                 Pogledaj pošiljke
               </button>
             </form>
+
+            <form action="/couriers/delete/<%= c._id %>" method="POST" onsubmit="return confirm('Jeste li sigurni da želite obrisati ovog kurira?');">
+              <button type="submit" class="btn btn-danger btn-sm">
+                Izbriši kurira
+              </button>
+            </form>
           </div>
         </li>
       <% }) %>
-
     </ul>
   <% } %>
 </section>

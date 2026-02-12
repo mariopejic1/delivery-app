@@ -24,8 +24,19 @@
                 <input type="text" name="phone" value="<%= user.phone || '' %>">
             </div>
 
-            <button type="submit" class="btn btn-primary">Spremi promjene</button>
-            <a href="/users/profile" class="btn btn-secondary">Odustani</a>
+            <% if (user.role === 'DOSTAVNA_SLUŽBA') { %>
+                <div class="form-group" style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
+                    <label><strong>Cijena dostave (€):</strong></label>
+                    <input type="number" name="deliveryPrice" step="0.01" 
+                        value="<%= company ? company.deliveryPrice : '' %>" placeholder="Npr. 5.00">
+                    <small style="color: #666; display: block;">Ova cijena će se automatski primjenjivati na nove pošiljke.</small>
+                </div>
+            <% } %>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Spremi promjene</button>
+                <a href="/users/profile" class="btn btn-secondary">Odustani</a>
+            </div>
         </form>
     </section>
 </div>
