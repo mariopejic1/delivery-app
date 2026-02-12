@@ -7,7 +7,7 @@ const companySchema = new mongoose.Schema({
     unique: true
   },
   address: String,
-  // Cijena dostave specifična za ovu tvrtku
+
   deliveryPrice: {
     type: Number,
     required: true,

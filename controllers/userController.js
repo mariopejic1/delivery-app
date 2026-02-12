@@ -1,11 +1,9 @@
 const User = require("../models/User");
 const Company = require('../models/Company');
 
-// Prikaz profila
 exports.getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.session.user.id).populate('company');
-        // Pošto smo uradili .populate('company'), cijena je sada u user.company.price
         res.render("pages/profile", { user, company: user.company });
     } catch (err) {
         console.error(err);
@@ -13,7 +11,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Prikaz forme za editiranje
 exports.getEditProfile = async (req, res) => {
     try {
         const user = await User.findById(req.session.user.id).populate('company');
@@ -23,7 +20,6 @@ exports.getEditProfile = async (req, res) => {
     }
 };
 
-// Snimanje promjena
 exports.updateProfile = async (req, res) => {
     try {
         const { name, email, phone, deliveryPrice } = req.body;
@@ -37,7 +33,6 @@ exports.updateProfile = async (req, res) => {
 
         if (user.role === 'DOSTAVNA_SLUŽBA' && user.company) {
             await Company.findByIdAndUpdate(user.company, {
-                // PROMIJENJENO: deliveryPrice umjesto price
                 deliveryPrice: parseFloat(deliveryPrice) || 0 
             });
         }
@@ -52,18 +47,15 @@ exports.updateProfile = async (req, res) => {
         res.render("pages/edit-profile", { user, company: user.company, error: "Greška pri spremanju podataka" });
     }
 };
-// Brisanje vlastitog profila
+
 exports.deleteProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
-        // Opcionalno: Ako želiš da brisanjem korisnika nestane i njegova tvrtka
         await Company.findOneAndDelete({ owner: userId });
 
-        // 1. Obriši korisnika iz baze
         await User.findByIdAndDelete(userId);
 
-        // 2. Uništi sesiju
         req.session.destroy((err) => {
             if (err) {
                 console.error("Greška pri uništavanju sesije:", err);

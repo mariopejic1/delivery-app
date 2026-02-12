@@ -7,7 +7,6 @@
       <li class="shipment-item card">
         <strong><%= shipment.title %></strong> - <%= shipment.address %> - Status: <%= shipment.status %>
 
-        <!-- Dropdown za dodjelu kurira -->
         <form action="/shipments/assign" method="POST" style="margin-top: 10px;">
           <input type="hidden" name="shipmentId" value="<%= shipment._id %>">
           <select name="courierId" required>

@@ -1,38 +1,171 @@
 <%- include("../partials/header") %>
 
-<section class="container">
-  <h2>Moji kuriri</h2>
+<main class="main-content">
+  <section class="container courier-list-section">
+    <div class="header-flex">
+      <h2>Moji kuriri</h2>
+      <a href="/register-courier" class="btn-add-new">Dodaj novog kurira</a>
+    </div>
 
-  <% if(!couriers || couriers.length === 0) { %>
-    <p>Nema registriranih kurira.</p>
-  <% } else { %>
-    <ul class="list-group">
-      <% couriers.forEach(c => { %>
-        <li class="list-group-item" style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <strong>Ime:</strong> <%= c.name %><br>
-            <strong>Email:</strong> <%= c.email %><br>
-            <strong>Telefon:</strong> <%= c.phone || "Nije postavljeno" %>
+    <% if(!couriers || couriers.length === 0) { %>
+      <div class="card empty-state">
+        <p>Nema registriranih kurira u vašoj tvrtki.</p>
+      </div>
+    <% } else { %>
+      <div class="courier-grid">
+        <% couriers.forEach(c => { %>
+          <div class="card courier-card">
+            <div class="courier-info">
+              <div class="info-group">
+                <span class="label">Ime i prezime</span>
+                <p class="value"><%= c.name %></p>
+              </div>
+              <div class="info-group">
+                <span class="label">Email</span>
+                <p class="value"><%= c.email %></p>
+              </div>
+              <div class="info-group">
+                <span class="label">Telefon</span>
+                <p class="value"><%= c.phone || "Nije postavljeno" %></p>
+              </div>
+            </div>
+
+            <div class="courier-actions">
+              <form method="GET" action="/shipments/courier">
+                <input type="hidden" name="courierId" value="<%= c._id %>">
+                <button type="submit" class="btn-main-sm">
+                  Pogledaj pošiljke
+                </button>
+              </form>
+
+              <form action="/couriers/delete/<%= c._id %>" method="POST" onsubmit="return confirm('Jeste li sigurni da želite obrisati ovog kurira?');">
+                <button type="submit" class="btn-delete-link">
+                  Izbriši kurira
+                </button>
+              </form>
+            </div>
           </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</main>
 
-          <div style="display: flex; gap: 10px;">
-            <form method="GET" action="/shipments/courier">
-              <input type="hidden" name="courierId" value="<%= c._id %>">
-              <button type="submit" class="btn btn-primary btn-sm">
-                Pogledaj pošiljke
-              </button>
-            </form>
+<style>
+  .courier-list-section {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
 
-            <form action="/couriers/delete/<%= c._id %>" method="POST" onsubmit="return confirm('Jeste li sigurni da želite obrisati ovog kurira?');">
-              <button type="submit" class="btn btn-danger btn-sm">
-                Izbriši kurira
-              </button>
-            </form>
-          </div>
-        </li>
-      <% }) %>
-    </ul>
-  <% } %>
-</section>
+  .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .header-flex h2 {
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .btn-add-new {
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .courier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .courier-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .courier-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .info-group {
+    margin-bottom: 12px;
+  }
+
+  .info-group .label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .info-group .value {
+    margin: 2px 0 0 0;
+    color: #334155;
+    font-weight: 600;
+  }
+
+  .courier-actions {
+    margin-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-main-sm {
+    width: 100%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-main-sm:hover {
+    background: #2563eb;
+  }
+
+  .btn-delete-link {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .btn-delete-link:hover {
+    text-decoration: underline;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px;
+    color: #64748b;
+  }
+</style>
 
 <%- include("../partials/footer") %>

@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
     default: "KORISNIK"
   },
 
-  // 🔥 KLJUČNO
   company: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",

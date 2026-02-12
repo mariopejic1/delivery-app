@@ -1,37 +1,63 @@
 <%- include("../partials/header") %>
 
-<div class="container">
-    <h2>💳 Simulacija kartičnog plaćanja</h2>
+<main class="main-content">
+    <section class="card payment-card">
+        <h2>💳 Simulacija plaćanja</h2>
 
-    <form method="POST" action="/shipments/payment/<%= shipmentId %>" class="card-form">
+        <form method="POST" action="/shipments/payment/<%= shipmentId %>" class="styled-form">
 
-        <label>Ime i prezime</label>
-        <input required name="name" value="<%= locals.values ? values.name : '' %>">
-
-        <label>Broj kartice</label>
-        <input required name="cardNumber" maxlength="16" placeholder="1234 5678 9012 3456" 
-               value="<%= locals.values ? values.cardNumber : '' %>">
-
-        <label>Datum isteka</label>
-        <input required name="expiry" placeholder="MM/YY" 
-               value="<%= locals.values ? values.expiry : '' %>">
-
-        <label>CVV</label>
-        <input required name="cvv" maxlength="3" type="password">
-
-        <% if (locals.error) { %>
-            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 15px 0; border: 1px solid #f5c6cb;">
-                <%= error %>
+            <div class="form-group">
+                <label class="field-label">Ime i prezime na kartici</label>
+                <input required name="name" class="input" value="<%= locals.values ? values.name : '' %>">
             </div>
-        <% } %>
 
-        <button type="submit" class="btn btn-primary">Plati (simulacija)</button>
+            <div class="form-group">
+                <label class="field-label">Broj kartice</label>
+                <input required name="cardNumber" class="input" maxlength="16" placeholder="1234 5678 9012 3456" 
+                       value="<%= locals.values ? values.cardNumber : '' %>">
+            </div>
 
-    </form>
+            <div class="grid-inputs">
+                <div class="form-group">
+                    <label class="field-label">Datum isteka</label>
+                    <input required name="expiry" class="input" placeholder="MM/YY" 
+                           value="<%= locals.values ? values.expiry : '' %>">
+                </div>
+                <div class="form-group">
+                    <label class="field-label">CVV</label>
+                    <input required name="cvv" class="input" maxlength="3" type="password" placeholder="***">
+                </div>
+            </div>
 
-    <p style="margin-top:15px;color:gray">
-        ⚠ Ovo je samo simulacija – stvarno plaćanje se NE izvršava
-    </p>
-</div>
+            <% if (locals.error) { %>
+                <div class="alert-error">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <button type="submit" class="btn-main">Plati (simulacija)</button>
+        </form>
+
+        <p class="disclaimer">
+            ⚠ Ovo je samo simulacija – stvarno plaćanje se NE izvršava
+        </p>
+    </section>
+</main>
+
+<style>
+    .payment-card { max-width: 450px; margin: 50px auto; padding: 35px; }
+    .payment-card h2 { text-align: center; color: #1e293b; margin-bottom: 30px; }
+    .styled-form { display: flex; flex-direction: column; gap: 15px; }
+    
+    .field-label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; color: #4a5568; }
+    .input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; box-sizing: border-box; font-size: 1rem; }
+    .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    
+    .btn-main { background: #3b82f6; color: white; padding: 18px; border-radius: 10px; font-weight: 700; font-size: 1.1rem; border: none; cursor: pointer; width: 100%; margin-top: 10px; }
+    .btn-main:hover { background: #2563eb; }
+    
+    .alert-error { background: #fef2f2; color: #b91c1c; padding: 12px; border-radius: 8px; border: 1px solid #fecaca; text-align: center; }
+    .disclaimer { margin-top: 20px; color: #94a3b8; font-size: 0.8rem; text-align: center; font-style: italic; }
+</style>
 
 <%- include("../partials/footer") %>

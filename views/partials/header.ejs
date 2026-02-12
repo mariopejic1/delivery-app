@@ -4,47 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dostava App</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <header class="header">
   <nav class="nav">
-
-    <a href="/" class="logo">Početna</a>
+    <a href="/" class="logo">📦 DostavaApp</a>
 
     <div class="nav-links">
-
       <% if(user){ %>
-
-        <!-- ✅ DASHBOARD LINK PO ULOZI -->
         <% if(user.role === "KORISNIK"){ %>
           <a href="/dashboard">Dashboard</a>
-        <% } %>
-
-        <% if(user.role === "DOSTAVLJAC"){ %>
+        <% } else if(user.role === "DOSTAVLJAC"){ %>
           <a href="/dashboard-courier">Dashboard</a>
-        <% } %>
-
-        <% if(user.role === "DOSTAVNA_SLUŽBA"){ %>
+        <% } else if(user.role === "DOSTAVNA_SLUŽBA"){ %>
           <a href="/dashboard-company">Dashboard</a>
         <% } %>
 
-        <a href="/users/profile">Profil</a>
-        <a href="/auth/logout">Odjava</a>
+        <a href="/users/profile">Moj Profil</a>
+        <a href="/auth/logout" style="color: #dc3545; font-weight: bold;">Odjava</a>
 
       <% } else { %>
-
         <a href="/auth/login">Prijava</a>
-        <a href="/auth/register">Registracija</a>
-
+        <a href="/auth/register" class="btn btn-primary" style="color: white; padding: 0.5rem 1rem;">Registracija</a>
       <% } %>
-
     </div>
-
   </nav>
 </header>
 
-<main class="main-content">
+<main class="main-content container">

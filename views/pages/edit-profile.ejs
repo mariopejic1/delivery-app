@@ -1,44 +1,138 @@
 <%- include("../partials/header") %>
 
-<div class="container">
-    <section class="card profile-card">
-        <h2>Uredi profil</h2>
+<main class="main-content">
+    <div class="container">
+        <section class="card profile-card">
+            <h2>Uredi profil</h2>
 
-        <% if (locals.error) { %>
-            <div style="color: red; margin-bottom: 10px;"><%= error %></div>
-        <% } %>
-
-        <form action="/users/profile/update" method="POST">
-            <div class="form-group">
-                <label>Ime:</label>
-                <input type="text" name="name" value="<%= user.name %>" required>
-            </div>
-
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="email" name="email" value="<%= user.email %>" required>
-            </div>
-
-            <div class="form-group">
-                <label>Telefon:</label>
-                <input type="text" name="phone" value="<%= user.phone || '' %>">
-            </div>
-
-            <% if (user.role === 'DOSTAVNA_SLUŽBA') { %>
-                <div class="form-group" style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
-                    <label><strong>Cijena dostave (€):</strong></label>
-                    <input type="number" name="deliveryPrice" step="0.01" 
-                        value="<%= company ? company.deliveryPrice : '' %>" placeholder="Npr. 5.00">
-                    <small style="color: #666; display: block;">Ova cijena će se automatski primjenjivati na nove pošiljke.</small>
-                </div>
+            <% if (locals.error) { %>
+                <div class="alert-error"><%= error %></div>
             <% } %>
 
-            <div style="margin-top: 20px;">
-                <button type="submit" class="btn btn-primary">Spremi promjene</button>
-                <a href="/users/profile" class="btn btn-secondary">Odustani</a>
-            </div>
-        </form>
-    </section>
-</div>
+            <form action="/users/profile/update" method="POST" class="edit-form">
+                <div class="form-group">
+                    <label>Ime:</label>
+                    <input type="text" name="name" value="<%= user.name %>" required class="input">
+                </div>
+
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" name="email" value="<%= user.email %>" required class="input">
+                </div>
+
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" name="phone" value="<%= user.phone || '' %>" class="input">
+                </div>
+
+                <% if (user.role === 'DOSTAVNA_SLUŽBA') { %>
+                    <div class="company-box">
+                        <label><strong>Cijena dostave (€):</strong></label>
+                        <input type="number" name="deliveryPrice" step="0.01" 
+                            value="<%= company ? company.deliveryPrice : '' %>" placeholder="Npr. 5.00" class="input">
+                        <small class="help-text">Ova cijena će se automatski primjenjivati na nove pošiljke.</small>
+                    </div>
+                <% } %>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Spremi promjene</button>
+                    <a href="/users/profile" class="btn btn-secondary">Odustani</a>
+                </div>
+            </form>
+        </section>
+    </div>
+</main>
+
+<style>
+    .profile-card {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #dbeafe;
+    }
+    .profile-card h2 {
+        text-align: center;
+        margin-top: 0;
+        color: #1e293b;
+        margin-bottom: 25px;
+    }
+    .edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #4a5568;
+    }
+    .input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #f8fafc;
+        box-sizing: border-box; 
+        font-size: 1rem;
+    }
+    .input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .company-box {
+        margin-top: 10px;
+        padding: 15px;
+        background: #f1f5f9;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+    .help-text {
+        color: #718096;
+        display: block;
+        margin-top: 5px;
+        font-size: 0.8rem;
+    }
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        flex: 1;
+    }
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        flex: 1;
+    }
+</style>
 
 <%- include("../partials/footer") %>

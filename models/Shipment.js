@@ -20,15 +20,15 @@ const shipmentSchema = new mongoose.Schema({
   },
 
   receiverName: String,
-  receiverEmail: String,    // DODANO
-  receiverPhone: String,    // DODANO (usklađeno s kontrolerom)
-  receiverAddress: String,  // PROMIJENJENO (usklađeno s kontrol
+  receiverEmail: String,    
+  receiverPhone: String,    
+  receiverAddress: String,  
 
   price: { 
     type: Number, 
     default: 0 
   },
-  
+
   status: {
     type: String,
     enum: ["CREATED", "ASSIGNED", "IN_TRANSIT", "DELIVERED"],

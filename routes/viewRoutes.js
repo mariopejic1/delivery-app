@@ -4,10 +4,9 @@ const { auth } = require("../middleware/auth");
 const { allow } = require("../middleware/roles");
 const Shipment = require("../models/Shipment");
 const User = require("../models/User");
-const Notification = require("../models/Notification"); // Provjeri putanju do modela!
+const Notification = require("../models/Notification"); 
 
-// Početna stranica
-// Početna stranica
+
 router.get('/', async (req, res) => {
   const { trackingId } = req.query;
   let shipment = null;
@@ -16,7 +15,7 @@ router.get('/', async (req, res) => {
   if (trackingId) {
     try {
       if (trackingId.match(/^[0-9a-fA-F]{24}$/)) {
-        // Dodajemo sender i company u populate
+
         shipment = await Shipment.findById(trackingId).populate('sender company courier');
         if (!shipment) error = "Pošiljka nije pronađena.";
       } else {
@@ -38,17 +37,15 @@ router.get("/dashboard-user", auth, async (req, res) => {
   try {
     const userId = req.session.user.id;
 
-    // 1. Dohvaćanje nepročitanih za badge
     const unreadCount = await Notification.countDocuments({ user: userId, isRead: false });
 
-    // 2. Zadnje 3 za dashboard preview
     const latestNotifications = await Notification.find({ user: userId })
       .sort({ createdAt: -1 })
       .limit(3);
 
     res.render("pages/dashboard-user", {
       user: req.session.user,
-      unreadCount, // <--- Ovo šaljemo EJS-u za badge
+      unreadCount, 
       latestNotifications
     });
   } catch (err) {
@@ -59,16 +56,12 @@ router.get("/dashboard-user", auth, async (req, res) => {
 
 router.get("/notifications", auth, async (req, res) => {
   try {
-    // Koristimo fallback: ako ne postoji req.session.user, uzmi req.user
     const currentUser = req.session.user || req.user;
     const userId = currentUser.id || currentUser._id;
 
-    // 1. Dohvati sve obavijesti
     const notifications = await Notification.find({ user: userId })
       .sort({ createdAt: -1 });
     
-    // 2. Označi ih kao pročitane tek NAKON što ih dohvatimo za prikaz
-    // (tako da korisnik vidi što je bilo novo prije nego badge nestane)
     await Notification.updateMany(
       { user: userId, isRead: false }, 
       { $set: { isRead: true } }
@@ -77,7 +70,7 @@ router.get("/notifications", auth, async (req, res) => {
     res.render("pages/notifications", { 
       notifications, 
       user: currentUser,
-      unreadCount: 0 // Resetiramo brojač jer smo ih upravo pročitali
+      unreadCount: 0 
     });
   } catch (err) {
     console.error("Greška kod notifikacija:", err);
@@ -85,7 +78,6 @@ router.get("/notifications", auth, async (req, res) => {
   }
 });
 
-// Dashboard korisnika
 router.get("/dashboard", auth, allow("KORISNIK"), async (req, res) => {
   const shipments = await Shipment.find({ sender: req.user._id });
   res.render("pages/dashboard-user", { 
@@ -97,7 +89,6 @@ router.get("/dashboard", auth, allow("KORISNIK"), async (req, res) => {
   });
 });
 
-// Dashboard dostavne službe
 router.get("/dashboard-company", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
   const shipments = await Shipment.find({ status: { $ne: "DOSTAVLJENO" } });
   const couriers = await User.find({ role: "DOSTAVLJAC", company: req.user._id });
@@ -111,7 +102,6 @@ router.get("/dashboard-company", auth, allow("DOSTAVNA_SLUŽBA"), async (req, re
   });
 });
 
-// Dashboard dostavljača
 router.get("/dashboard-courier", auth, allow("DOSTAVLJAC"), async (req, res) => {
   const activeShipments = await Shipment.find({ courier: req.user._id, status: { $ne: "DOSTAVLJENO" } });
   const historyShipments = await Shipment.find({ courier: req.user._id, status: "DOSTAVLJENO" });
@@ -122,17 +112,16 @@ router.get("/dashboard-courier", auth, allow("DOSTAVLJAC"), async (req, res) => 
     historyShipments,
     titleActive: "Aktivne pošiljke",
     titleHistory: "Povijest pošiljki",
-    showActionsActive: true,  // aktivne pošiljke mogu mijenjati status
-    showActionsHistory: false, // povijest ne može
-    couriers: []  // dostavljač ne koristi dropdown
+    showActionsActive: true,  
+    showActionsHistory: false, 
+    couriers: []  
   });
 });
 
-// Nova pošiljka (KORISNIK)
 router.get("/shipments/new", auth, async (req, res) => {
   try {
     const Company = require("../models/Company");
-    // Dohvaćamo sve tvrtke iz nove kolekcije
+
     const allCompanies = await Company.find(); 
     
     res.render("pages/new-shipment", { 
@@ -144,7 +133,6 @@ router.get("/shipments/new", auth, async (req, res) => {
   }
 });
 
-// Registracija kurira (tvrtka)
 router.get("/register-courier", auth, allow("DOSTAVNA_SLUŽBA"), (req, res) => {
   res.render("pages/register-courier");
 });
@@ -169,18 +157,16 @@ router.post("/register-courier", auth, allow("DOSTAVNA_SLUŽBA"), async (req, re
   res.redirect("/dashboard-company");
 });
 
-// Lista kurira tvrtke
 router.get("/my-couriers", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
-  // Tražimo samo aktivne dostavljače te tvrtke
+
   const couriers = await User.find({ 
     role: "DOSTAVLJAC", 
     company: req.user.id,
-    active: { $ne: false } // Prikazuje one koji nisu deaktivirani
+    active: { $ne: false } 
   });
   res.render("pages/my-couriers", { user: req.user, couriers });
 });
 
-// Aktivne pošiljke tvrtke
 router.get("/shipments/active", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
 
   const shipments = await Shipment.find({
@@ -202,7 +188,6 @@ router.get("/shipments/active", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res
 });
 
 
-// Povijest pošiljki tvrtke
 router.get("/shipments/history", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
 
   const shipments = await Shipment.find({
@@ -219,7 +204,6 @@ router.get("/shipments/history", auth, allow("DOSTAVNA_SLUŽBA"), async (req, re
 });
 
 
-// Aktivne pošiljke određenog kurira
 router.get("/shipments/courier/:id/active", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
   const courier = await User.findOne({ _id: req.params.id, company: req.user.id });
   if (!courier) return res.status(403).send("Ne možete vidjeti ovog kurira");
@@ -234,7 +218,6 @@ router.get("/shipments/courier/:id/active", auth, allow("DOSTAVNA_SLUŽBA"), asy
   });
 });
 
-// Povijest pošiljki određenog kurira
 router.get("/shipments/courier/:id/history", auth, allow("DOSTAVNA_SLUŽBA"), async (req, res) => {
   const courier = await User.findOne({ _id: req.params.id, company: req.user.id });
   if (!courier) return res.status(403).send("Ne možete vidjeti ovog kurira");
@@ -249,7 +232,6 @@ router.get("/shipments/courier/:id/history", auth, allow("DOSTAVNA_SLUŽBA"), as
   });
 });
 
-// Moje pošiljke – korisnik
 router.get("/my", auth, allow("KORISNIK"), async (req, res) => {
     const shipments = await Shipment.find({ sender: req.user._id })
         .populate("company", "name")
@@ -264,8 +246,6 @@ router.post("/couriers/delete/:id", auth, allow("DOSTAVNA_SLUŽBA"), async (req,
     const courierId = req.params.id;
     const companyId = req.session.user ? req.session.user.id : req.user._id;
 
-    // Umjesto brisanja, samo ga deaktiviramo
-    // Ako nemaš polje 'active' u modelu, Mongoose će ga sam kreirati
     await User.findOneAndUpdate(
       { _id: courierId, company: companyId },
       { $set: { active: false, role: "BIVSI_DOSTAVLJAC" } } 

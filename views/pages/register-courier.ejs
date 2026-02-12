@@ -1,14 +1,130 @@
 <%- include("../partials/header") %>
 
-<section class="auth-card card">
-  <h2>Registracija novog kurira</h2>
-  <form method="POST" action="/register-courier">
-    <input type="text" name="name" placeholder="Ime" required class="input">
-    <input type="email" name="email" placeholder="Email" required class="input">
-    <input type="password" name="password" placeholder="Lozinka" required class="input">
-    <input type="text" name="phone" placeholder="Telefon" class="input">
-    <button type="submit" class="btn btn-primary">Registriraj kurira</button>
-  </form>
-</section>
+<main class="main-content">
+  <section class="auth-card card">
+    <h2>Registracija novog kurira</h2>
+    <p class="subtitle">Dodajte novog djelatnika u svoj tim.</p>
+
+    <form method="POST" action="/register-courier" class="styled-form">
+      <div class="form-group">
+        <label class="field-label">Ime i prezime</label>
+        <input type="text" name="name" placeholder="Ime i Prezime" required class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="field-label">Email adresa</label>
+        <input type="email" name="email" placeholder="kurir@tvrtka.hr" required class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="field-label">Lozinka</label>
+        <input type="password" name="password" placeholder="••••••••" required class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="field-label">Broj telefona</label>
+        <input type="text" name="phone" placeholder="09x xxxx xxx" class="input">
+      </div>
+
+      <button type="submit" class="btn-main">Registriraj kurira</button>
+    </form>
+    
+    <div class="auth-footer">
+      <a href="/dashboard">Povratak na dashboard</a>
+    </div>
+  </section>
+</main>
+
+<style>
+  .auth-card {
+    max-width: 450px;
+    margin: 50px auto;
+    padding: 35px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #dbeafe;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-card h2 {
+    text-align: center;
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+  }
+
+  .styled-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #4a5568;
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-main {
+    background: #3b82f6;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background 0.2s;
+  }
+
+  .btn-main:hover {
+    background: #2563eb;
+  }
+
+  .auth-footer {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .auth-footer a {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+
+  .auth-footer a:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+</style>
 
 <%- include("../partials/footer") %>

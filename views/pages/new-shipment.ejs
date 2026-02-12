@@ -1,47 +1,166 @@
 <%- include("../partials/header") %>
 
-<h2>Nova pošiljka</h2>
+<main class="main-content">
+  <section class="card shipment-card">
+    <h2>Nova pošiljka</h2>
 
-<% if (typeof error !== 'undefined' && error) { %>
-    <div style="background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; margin-bottom: 15px;">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert-error">
         <%= error %>
-    </div>
-<% } %>
+      </div>
+    <% } %>
 
-<form method="POST" action="/shipments/create">
+    <form method="POST" action="/shipments/create" class="styled-form">
+      
+      <div class="form-section">
+        <h3>Primatelj</h3>
+        <div class="input-row">
+          <input name="receiverName" placeholder="Ime i prezime" required class="input">
+          <input name="receiverEmail" type="email" placeholder="Email primatelja" required class="input">
+          <input name="receiverPhone" type="tel" pattern="\d+" title="Unesite samo znamenke" placeholder="Telefon" required class="input">
+        </div>
+        <input name="receiverAddress" placeholder="Adresa dostave" required class="input">
+        <textarea name="description" placeholder="Opis paketa (opcionalno)" class="input textarea"></textarea>
+      </div>
 
-    <h3>Primatelj</h3>
-    <input name="receiverName" placeholder="Ime i prezime" required class="input">
-    
-    <input name="receiverEmail" type="email" placeholder="Email primatelja" required class="input">
-    
-    <input name="receiverPhone" type="tel" pattern="\d+" title="Unesite samo znamenke" placeholder="Telefon (samo znamenke)" required class="input">
-    
-    <input name="receiverAddress" placeholder="Adresa" required class="input">
-    <textarea name="description" placeholder="Opis paketa"></textarea>
-    
-    <h3>Dimenzije (cm)</h3>
-    <input name="width" placeholder="Širina" required type="number" min="0.1" step="any">
-    <input name="height" placeholder="Visina" required type="number" min="0.1" step="any">
-    <input name="length" placeholder="Dužina" required type="number" min="0.1" step="any">
-    <input name="weight" placeholder="Težina (kg)" required type="number" min="0.1" step="any">
+      <div class="form-grid-compact">
+        <div class="form-section">
+          <h3>Dimenzije (cm) & Težina</h3>
+          <div class="dimensions-grid">
+            <input name="width" placeholder="Širina" required type="number" min="0.1" step="any" class="input">
+            <input name="height" placeholder="Visina" required type="number" min="0.1" step="any" class="input">
+            <input name="length" placeholder="Dužina" required type="number" min="0.1" step="any" class="input">
+            <input name="weight" placeholder="Težina (kg)" required type="number" min="0.1" step="any" class="input">
+          </div>
+        </div>
 
-    <h3>Način plaćanja</h3>
-    <select name="paymentMethod" required>
-        <option value="GOTOVINA">Gotovina unaprijed</option>
-        <option value="PRILIKOM_POUZECA">Plaćanje prilikom preuzimanja</option>
-        <option value="KARTICA">Kartično plaćanje</option>
-    </select>
+        <div class="form-section">
+          <h3>Plaćanje & Služba</h3>
+          <select name="paymentMethod" required class="input select-input">
+            <option value="" disabled selected>Način plaćanja</option>
+            <option value="GOTOVINA">Gotovina unaprijed</option>
+            <option value="PRILIKOM_POUZECA">Plaćanje pouzećem</option>
+            <option value="KARTICA">Kartično plaćanje</option>
+          </select>
 
-    <label for="senderCompany">Odaberite dostavnu službu:</label>
-    <select name="company" id="senderCompany" required>
-        <option value="" disabled selected>Odaberite tvrtku</option>
-        <% companies.forEach(c => { %>
-            <option value="<%= c._id %>"><%= c.name %> (<%= c.deliveryPrice %> €)</option>
-        <% }) %>
-    </select>
+          <select name="company" id="senderCompany" required class="input select-input">
+            <option value="" disabled selected>Odaberite dostavnu službu</option>
+            <% companies.forEach(c => { %>
+              <option value="<%= c._id %>"><%= c.name %> (<%= c.deliveryPrice %> €)</option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
 
-    <button type="submit">Pošalji paket</button>
-</form>
+      <button type="submit" class="btn-main">Kreiraj pošiljku</button>
+    </form>
+  </section>
+</main>
+
+<style>
+  .shipment-card {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 30px;
+  }
+
+  .shipment-card h2 {
+    text-align: center;
+    color: #1e293b;
+    margin-bottom: 30px;
+  }
+
+  .form-section h3 {
+    font-size: 1rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 5px;
+  }
+
+  .styled-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .input-row .input {
+    flex: 1;
+  }
+
+  .form-grid-compact {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+  }
+
+  .dimensions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+  }
+
+  .textarea {
+    height: 60px;
+    resize: none;
+    margin-top: 10px;
+  }
+
+  .select-input {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .btn-main {
+    background: #3b82f6;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-main:hover {
+    background: #2563eb;
+  }
+
+  .alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .input-row, .form-grid-compact {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+  }
+</style>
 
 <%- include("../partials/footer") %>

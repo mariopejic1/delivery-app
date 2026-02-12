@@ -1,27 +1,125 @@
 <%- include("../partials/header") %>
 
-<section class="card profile-card">
-  <h2>Profil</h2>
-  <p><strong>Ime:</strong> <%= user.name %></p>
-  <p><strong>Email:</strong> <%= user.email %></p>
-  <p><strong>Telefon:</strong> <%= user.phone || 'Nije uneseno' %></p>
-  <p><strong>Uloga:</strong> <%= user.role %></p>
+<main class="main-content">
+  <section class="card profile-card">
+    <div class="profile-header">
+      <h2>Profil korisnika</h2>
+      <span class="role-tag"><%= user.role %></span>
+    </div>
 
-  <% if (user.role === 'DOSTAVNA_SLUŽBA' && company) { %>
-    <p><strong>Cijena dostave:</strong> <%= company.deliveryPrice %> €</p>
-  <% } else if (user.role === 'DOSTAVNA_SLUŽBA') { %>
-      <p style="color: red;">Tvrtka nije povezana s vašim profilom.</p>
-  <% } %>
-  <hr>
-  <div class="btn-group" style="display: flex; gap: 10px; align-items: center;">
-    <a href="/users/profile/edit" class="btn btn-warning">Uredi podatke</a>
+    <div class="info-list">
+      <div class="info-item">
+        <strong>Ime:</strong>
+        <span><%= user.name %></span>
+      </div>
+      <div class="info-item">
+        <strong>Email:</strong>
+        <span><%= user.email %></span>
+      </div>
+      <div class="info-item">
+        <strong>Telefon:</strong>
+        <span><%= user.phone || 'Nije uneseno' %></span>
+      </div>
 
-    <form action="/users/profile/delete" method="POST" onsubmit="return confirm('Jeste li sigurni da želite obrisati profil? Ova akcija je nepovratna.');" style="display: inline;">
-      <button type="submit" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">
-        Obriši profil
-      </button>
-    </form>
-  </div>
-</section>
+      <% if (user.role === 'DOSTAVNA_SLUŽBA') { %>
+        <div class="price-section">
+          <% if (company) { %>
+            <p><strong>Cijena dostave:</strong> <span class="price"><%= company.deliveryPrice %> €</span></p>
+          <% } else { %>
+            <p class="error-text">Tvrtka nije povezana s vašim profilom.</p>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
+    <hr class="divider">
+
+    <div class="btn-group">
+      <a href="/users/profile/edit" class="btn btn-warning">Uredi podatke</a>
+
+      <form action="/users/profile/delete" method="POST" onsubmit="return confirm('Jeste li sigurni?');">
+        <button type="submit" class="btn-link-danger">Obriši profil</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<style>
+  .profile-card {
+    max-width: 480px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #dbeafe;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  .profile-header h2 { margin: 0; color: #1e293b; }
+
+  .role-tag {
+    background: #f0f4f8;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .price-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .price { font-weight: 800; color: #3b82f6; }
+  .error-text { color: #dc3545; font-size: 0.9rem; }
+  .divider { margin: 25px 0; border: none; border-top: 1px solid #e2e8f0; }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .btn-warning {
+    background: #3b82f6; 
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-link-danger {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .btn-link-danger:hover { color: #dc3545; }
+</style>
 
 <%- include("../partials/footer") %>

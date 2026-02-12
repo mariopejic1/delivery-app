@@ -1,116 +1,189 @@
+:root {
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --bg-body: #f0f4f8;
+  --bg-card: #ffffff;
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --border-color: #dbeafe;
+  --radius: 10px;
+  --header-footer-bg: #1e293b; 
+}
+
+html, body {
+  height: 100%; 
+}
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
-  background: #f4f5f7;
-  color: #333;
+  display: flex;
+  flex-direction: column; 
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.6;
   transition: background 0.3s ease;
 }
 
 a {
   text-decoration: none;
-  color: #007BFF;
-  transition: color 0.3s ease;
+  color: var(--primary);
+  transition: all 0.3s ease;
 }
 
 a:hover {
-  color: #0056b3;
+  color: var(--primary-hover);
 }
 
 .header {
-  background: #fff;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: var(--header-footer-bg);
+  padding: 0.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .nav {
+  max-width: 1100px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff !important;
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
 .nav-links a {
-  margin-left: 1rem;
-  font-weight: 600;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+.nav-links a:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
 .main-content {
+  flex: 1 0 auto; 
   padding: 2rem;
 }
 
 .card {
-  background: #fff;
+  background: var(--bg-card);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
   margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
 }
 
 .btn {
-  padding: 0.7rem 1.5rem;
+  padding: 0.6rem 1.4rem;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .btn-primary {
-  background: #007BFF;
+  background: var(--primary);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.btn-secondary {
-  background: #6c757d;
-  color: #fff;
-}
-
-.btn-secondary:hover {
-  background: #5a6268;
-}
-
-.input {
+.input, .search-input {
   display: block;
-  width: 90%;
+  width: 100%;
   padding: 0.7rem 1rem;
-  margin-bottom: 1rem;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  transition: border-color 0.3s ease;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
-.input:focus {
+.input:focus, .search-input:focus {
   outline: none;
-  border-color: #007BFF;
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.form-card, .auth-card, .profile-card {
-  max-width: 400px;
-  margin: 2rem auto;
+.home-section {
+  max-width: 800px;
+  margin: 1rem auto;
+  text-align: center;
 }
 
-.dashboard-actions {
+.tracking-box {
+  margin: 2rem 0;
+  padding: 2.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.search-form {
   display: flex;
-  gap: 1rem;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.shipment-list {
-  list-style: none;
-  padding: 0;
+.status-badge {
+  font-weight: bold;
+  color: #065f46;
+  background: #d1fae5;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
-.shipment-item {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-  background: #f9f9f9;
+.tracking-result {
+  border-left: 5px solid var(--primary);
+  padding: 1.5rem;
+  background: #fff;
+  text-align: left;
+  border-radius: 4px 12px 12px 4px;
+}
+
+.footer {
+  flex-shrink: 0; 
+  text-align: center;
+  padding: 0.8rem;
+  background: var(--header-footer-bg); 
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: #cbd5e1; 
+  font-size: 0.8rem;
+}
+
+.footer p {
+  margin: 0;
 }

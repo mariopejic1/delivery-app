@@ -1,26 +1,38 @@
 <%- include("../partials/header") %>
 
-<section class="dashboard card">
-  <h2>Dashboard tvrtke</h2>
+<main class="main-content">
+  <section class="dashboard-container card">
+    <h2>Dashboard tvrtke</h2>
 
-  <% if(!user || !user.company){ %>
-    <p style="color:red;">Niste povezani s tvrtkom. Ne možete pristupiti pošiljkama.</p>
-  <% } else { %>
-    <div class="dashboard-actions">
-      <!-- Ispravne rute za tvrtku -->
-      <a href="/shipments/company/active" class="btn btn-primary">Sve aktivne pošiljke</a>
-      <a href="/shipments/company/history" class="btn btn-secondary">Povijest pošiljki</a>
-      <a href="/register-courier" class="btn btn-secondary">Dodaj kurira</a>
-      <a href="/my-couriers" class="btn btn-secondary">Svi moji kuriri</a>
-    </div>
-  <% } %>
-
-  <!-- Debug panel (opcionalno, može se maknuti) -->
-  <section style="margin-top:20px;">
-    <h3>Debug info</h3>
-    <pre>Role: <%= user.role %>, Company ID: <%= user.company %></pre>
+    <% if(!user || !user.company){ %>
+      <p style="color: #ef4444; font-weight: 600;">Niste povezani s tvrtkom.</p>
+    <% } else { %>
+      <div class="btn-grid">
+        <a href="/shipments/company/active" class="btn btn-main">Sve aktivne pošiljke</a>
+        <a href="/shipments/company/history" class="btn btn-main">Povijest pošiljki</a>
+        <a href="/register-courier" class="btn btn-main">Dodaj kurira</a>
+        <a href="/my-couriers" class="btn btn-main">Svi moji kuriri</a>
+      </div>
+    <% } %>
   </section>
+</main>
 
-</section>
+<style>
+  .dashboard-container { max-width: 600px; margin: 50px auto; padding: 40px; text-align: center; }
+  .dashboard-container h2 { color: #1e293b; margin-bottom: 35px; }
+  .btn-grid { display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 0 auto; }
+
+  .btn-main {
+    display: block;
+    background: #3b82f6;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+  }
+  .btn-main:hover { background: #2563eb; }
+</style>
 
 <%- include("../partials/footer") %>

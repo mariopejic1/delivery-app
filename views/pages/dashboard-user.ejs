@@ -1,81 +1,55 @@
 <%- include("../partials/header") %>
 
-<style>
-  /* Kontejner dashboarda */
-  .dashboard-container { padding: 30px; margin-top: 20px; }
-  
-  /* Grupa gumba */
-  .btn-group { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
-  
-  /* Poseban stil za obavijesti gumb s badgeom */
-  .btn-notif-wrapper { position: relative; display: inline-block; }
-  
-  .notif-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #e74c3c;
-    color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    animation: pulse-animation 2s infinite;
-  }
-
-  @keyframes pulse-animation {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
-
-  /* Sekcija za zadnje obavijesti */
-  .latest-notifs-section { margin-top: 35px; border-top: 2px solid #f1f1f1; padding-top: 25px; }
-  .notif-card-mini {
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    background: #ffffff;
-    border: 1px solid #eee;
-    border-left: 5px solid #bdc3c7; /* Standardna siva za pročitane */
-    transition: 0.3s;
-  }
-  .notif-card-mini.unread {
-    border-left-color: #f39c12; /* Narančasta za nove */
-    background: #fffdf9;
-    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.1);
-  }
-  .notif-card-mini small { color: #888; }
-</style>
-
-<section class="dashboard-container card">
-  <div class="welcome-header">
-    <h1>Dobrodošli, <%= user.name %>! 👋</h1>
-    <p>Upravljajte svojim pošiljkama i pratite obavijesti u stvarnom vremenu.</p>
-  </div>
-
-  <div class="btn-group">
-    <a href="/shipments/new" class="btn btn-primary">➕ Nova pošiljka</a>
-    <a href="/shipments/my" class="btn btn-secondary">📦 Moje pošiljke</a>
-    
-    <div class="btn-notif-wrapper">
-      <a href="/notifications" class="btn btn-warning">
-        🔔 Obavijesti
-      </a>
-      <% if (locals.unreadCount && unreadCount > 0) { %>
-        <span class="notif-badge"><%= unreadCount %></span>
-      <% } %>
+<main class="main-content">
+  <section class="dashboard-container card">
+    <div class="welcome-header">
+      <h1>Dobrodošli, <%= user.name %>!</h1>
+      <p>Upravljajte svojim pošiljkama i obavijestima.</p>
     </div>
-  </div>
 
+    <div class="btn-grid">
+      <a href="/shipments/new" class="btn btn-main">Nova pošiljka</a>
+      <a href="/shipments/my" class="btn btn-main">Moje pošiljke</a>
+      
+      <div class="btn-wrapper">
+        <a href="/notifications" class="btn btn-main">Obavijesti</a>
+        <% if (locals.unreadCount && unreadCount > 0) { %>
+          <span class="notif-badge"><%= unreadCount %></span>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+
+<style>
+  .dashboard-container { max-width: 800px; margin: 50px auto; padding: 40px; text-align: center; }
+  .welcome-header h1 { color: #1e293b; margin-bottom: 10px; }
+  .welcome-header p { color: #64748b; margin-bottom: 40px; }
   
-  
-</section>
+  .btn-grid { display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 0 auto; }
+  .btn-wrapper { position: relative; width: 100%; }
+
+  .btn-main {
+    display: block;
+    background: #3b82f6;
+    color: white;
+    padding: 18px; 
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    border: none;
+  }
+  .btn-main:hover { background: #2563eb; }
+
+  .notif-badge {
+    position: absolute; top: -8px; right: -8px;
+    background: #ef4444; color: white; border-radius: 50%;
+    width: 26px; height: 26px; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white; font-weight: bold;
+  }
+</style>
 
 <%- include("../partials/footer") %>

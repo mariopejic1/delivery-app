@@ -1,14 +1,34 @@
 <%- include("../partials/header") %>
 
-<section class="dashboard card">
-  <h2>Dashboard dostavljača</h2>
-  <div class="dashboard-actions">
-    <!-- Aktivne pošiljke ovog kurira -->
-    <a href="/shipments/courier-active" class="btn btn-primary">Moje aktivne pošiljke</a>
+<main class="main-content">
+  <section class="dashboard-container card">
+    <div class="welcome-header">
+      <h2>Dashboard dostavljača</h2>
+    </div>
 
-    <!-- Povijest pošiljki ovog kurira -->
-    <a href="/shipments/courier-history" class="btn btn-secondary">Povijest pošiljki</a>
-  </div>
-</section>
+    <div class="btn-grid">
+      <a href="/shipments/courier-active" class="btn btn-main">Moje aktivne pošiljke</a>
+      <a href="/shipments/courier-history" class="btn btn-main">Povijest pošiljki</a>
+    </div>
+  </section>
+</main>
+
+<style>
+  .dashboard-container { max-width: 600px; margin: 60px auto; padding: 40px; text-align: center; }
+  .welcome-header h2 { color: #1e293b; margin-bottom: 35px; }
+  .btn-grid { display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 0 auto; }
+
+  .btn-main {
+    display: block;
+    background: #3b82f6;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+  }
+  .btn-main:hover { background: #2563eb; }
+</style>
 
 <%- include("../partials/footer") %>

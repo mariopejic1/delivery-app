@@ -1,11 +1,9 @@
-// potvrda brisanja
 document.querySelectorAll(".confirm").forEach(btn => {
   btn.addEventListener("click", e => {
     if (!confirm("Jeste li sigurni?")) e.preventDefault();
   });
 });
 
-// simulacija kartičnog plaćanja
 const payment = document.querySelector("#payment");
 
 if (payment) {

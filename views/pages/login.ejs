@@ -14,34 +14,59 @@
     <input type="password" name="password" placeholder="Lozinka" required class="input">
     <button type="submit" class="btn btn-primary">Prijavi se</button>
   </form>
-  <p>Nemate račun? <a href="/auth/register">Registrirajte se</a></p>
+  <p class="auth-footer">Nemate račun? <a href="/auth/register">Registrirajte se</a></p>
 </section>
 
 <style>
-  .alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 12px;
-    border-radius: 5px;
-    border: 1px solid #f5c6cb;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 0.9em;
-  }
   .auth-card {
     max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dbeafe;
+  }
+  .auth-card h2 {
+    text-align: center;
+    margin-top: 0;
+    color: #1e293b;
   }
   .form {
     display: flex;
     flex-direction: column;
     gap: 15px;
   }
+  .alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+  .auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #718096;
+  }
+
   .input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    box-sizing: border-box;
+  }
+  .input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 </style>
 
